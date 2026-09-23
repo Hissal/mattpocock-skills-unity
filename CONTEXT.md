@@ -37,6 +37,14 @@ The `unity` skill: the one entry point **Upstream skills** call for Unity knowle
 `docs/agents/unity.md` in a consuming repo, written by setup: how *this* repo compiles, tests, and validates, and where its own Unity conventions live.
 _Avoid_: unity setup, discovery
 
+**Verification ladder**:
+The ordered checks a **Unity repo** change can get, cheapest first: text checks, compile, targeted tests, full EditMode suite, PlayMode, player build, CI. A change is verified up to the highest rung it passed.
+_Avoid_: check pipeline, validation steps
+
+**Unvalidated**:
+A change, or the part of one, that needed a rung of the **Verification ladder** that did not run. Always reported with the reason the rung was skipped.
+_Avoid_: unverified, untested
+
 ## Relationships
 
 - An **Issue tracker** holds many **Issues**
