@@ -22,6 +22,10 @@ A canonical state-machine label applied to an **Issue** during triage (e.g. `nee
 A skill that also exists in `mattpocock/skills`. Its Unity changes stay small edits in place; anything larger moves into a **Unity skill** it points at.
 _Avoid_: original, base skill
 
+**Unity repo**:
+A repo holding a Unity project or a UPM package: the only kind of repo the Unity changes apply to.
+_Avoid_: Unity project (that is one of the two shapes, not the whole)
+
 **Unity skill**:
 A skill under `skills/unity/` that teaches one area of Unity mechanics (serialization, testing, ...), true for any Unity repo. It never holds facts about a specific repo.
 _Avoid_: Unity primitive, Unity module
@@ -39,7 +43,8 @@ _Avoid_: unity setup, discovery
 - An **Issue** carries one **Triage role** at a time
 - A **Decision ticket** is an **Issue** (a child of a `wayfinder:map`)
 - An **Upstream skill** reaches Unity knowledge only through the **Unity router**
-- The **Unity router** reads the **Unity config** for repo facts and a **Unity skill** for mechanics
+- The **Unity router** routes to **Unity skills** for mechanics; it holds no mechanics itself
+- The **Unity router** and each **Unity skill** read the **Unity config** for repo facts, falling back to generic defaults when it is absent
 
 ## Flagged ambiguities
 
