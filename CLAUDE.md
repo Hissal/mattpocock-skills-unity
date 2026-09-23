@@ -1,5 +1,7 @@
 This repo is an unofficial fork of `mattpocock/skills` (git remote `upstream`), adapting the skills for Unity projects. Upstream is merged in periodically, so keep each Unity change a small, local delta to the upstream file rather than a restructure: a moved or rewritten file turns every upstream merge into a hand-resolved conflict.
 
+`research/` archives the cited research behind the Unity adaptation, one file per area. Read the matching file before changing a Unity skill or a Unity delta, and when a finding goes stale, update the file rather than working around it.
+
 Skills are organized into bucket folders under `skills/`:
 
 - `engineering/`: daily code work
