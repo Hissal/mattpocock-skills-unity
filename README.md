@@ -1,16 +1,13 @@
-<p>
-  <a href="https://www.aihero.dev/s/skills-newsletter">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skills-repo-dark_2x.png">
-      <source media="(prefers-color-scheme: light)" srcset="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skill-repo-light_2x.png">
-      <img alt="Skills" src="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skill-repo-light_2x.png" width="369">
-    </picture>
-  </a>
-</p>
+# Skills For Real Engineers: Unity Edition
 
-# Skills For Real Engineers
+An unofficial fork of [Matt Pocock's skills](https://github.com/mattpocock/skills), adapted for Unity projects: games, packages, libraries and editor tooling. It is not maintained or endorsed by Matt Pocock.
 
-[![skills.sh](https://skills.sh/b/mattpocock/skills)](https://skills.sh/mattpocock/skills)
+The upstream skills are small, composable engineering procedures. This fork keeps them, and changes only the ones whose procedure assumes a conventional code project where Unity behaves differently (compilation, EditMode and PlayMode tests, serialized assets, `.meta` GUIDs, scenes and prefabs). Upstream changes are merged in periodically.
+
+> [!NOTE]
+> The Unity adaptation is in progress. Until it lands, the skills below are upstream's, unchanged.
+
+Upstream's introduction follows, lightly edited for the fork's install route.
 
 My agent skills that I use every day to do real engineering - not vibe coding.
 
@@ -18,13 +15,11 @@ Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit tr
 
 These skills are designed to be small, easy to adapt, and composable. They work with any model. They're based on decades of engineering experience. Hack around with them. Make them your own. Enjoy.
 
-If you want to keep up with changes to these skills, and any new ones I create, you can join ~60,000 other devs on my newsletter:
+## Installation
 
-[Sign Up To The Newsletter](https://www.aihero.dev/s/skills-newsletter)
+Two ways in, two philosophies. **The [Claude Code plugin](https://code.claude.com/docs/en/plugins)** installs the whole set as a managed, read-only bundle that updates from this repo, so you subscribe rather than fork. **[skills.sh](https://skills.sh)** copies editable skill files into your project, so you can hack on them and make them your own. Pick one: installing both leaves you with every skill twice.
 
-## Installation (30-second setup)
-
-Two ways in, two philosophies. **The [Claude Code plugin](https://code.claude.com/docs/en/plugins)** installs the whole set as a managed, read-only bundle that updates when I ship, so you subscribe rather than fork. **[skills.sh](https://skills.sh/mattpocock/skills)** copies editable skill files into your project, so you can hack on them and make them your own. Pick one: installing both leaves you with every skill twice.
+Skill names match upstream's. Uninstall `mattpocock-skills` (or upstream's skills.sh copies) before installing this fork, or you get every skill twice.
 
 ### 1. Get the skills
 
@@ -32,16 +27,21 @@ Two ways in, two philosophies. **The [Claude Code plugin](https://code.claude.co
 <summary><strong>Claude Code</strong></summary>
 
 ```bash
-claude plugins install mattpocock-skills
+claude plugin marketplace add Hissal/mattpocock-skills-unity
+```
+
+```bash
+claude plugin install mattpocock-skills-unity@hissal
 ```
 
 Or, from inside a session:
 
 ```
-/plugin install mattpocock-skills
+/plugin marketplace add Hissal/mattpocock-skills-unity
+/plugin install mattpocock-skills-unity@hissal
 ```
 
-It's in Claude Code's official marketplace, so there's nothing to add first, and updates arrive automatically.
+The repo is its own marketplace, so you add it once. Third-party marketplaces don't auto-update by default: `claude plugin update mattpocock-skills-unity@hissal` pulls a new version.
 
 </details>
 
@@ -49,12 +49,10 @@ It's in Claude Code's official marketplace, so there's nothing to add first, and
 <summary><strong>Codex, and other agents</strong></summary>
 
 ```bash
-npx skills@latest add mattpocock/skills
+npx skills@latest add Hissal/mattpocock-skills-unity
 ```
 
-Pick the skills you want, and which coding agents to install them on. **The installer lets you choose which skills to take, so make sure `setup-matt-pocock-skills` is one of them.**
-
-A native Codex plugin is on the roadmap (see [`.agents/adr/0002-ship-as-a-claude-code-plugin.md`](./.agents/adr/0002-ship-as-a-claude-code-plugin.md)).
+Pick the skills you want, and which coding agents to install them on. **The installer lets you choose which skills to take: make sure `setup-matt-pocock-skills` is one of them.**
 
 </details>
 
@@ -64,10 +62,10 @@ A native Codex plugin is on the roadmap (see [`.agents/adr/0002-ship-as-a-claude
 Use the same installer, on any agent, including Claude Code:
 
 ```bash
-npx skills@latest add mattpocock/skills
+npx skills@latest add Hissal/mattpocock-skills-unity
 ```
 
-It writes the skills into your repo as ordinary files you own and can edit. Nothing updates behind your back; pull my latest changes when you want them with `npx skills update`.
+It writes the skills into your repo as ordinary files you own and can edit. Nothing updates behind your back; pull the latest changes when you want them with `npx skills update`.
 
 </details>
 

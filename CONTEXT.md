@@ -18,11 +18,28 @@ A `wayfinder` unit: a child **Issue** of a `wayfinder:map` holding a *question* 
 **Triage role**:
 A canonical state-machine label applied to an **Issue** during triage (e.g. `needs-triage`, `ready-for-afk`). Each role maps to a real label string in the **Issue tracker** via `docs/agents/triage-labels.md`.
 
+**Upstream skill**:
+A skill that also exists in `mattpocock/skills`. Its Unity changes stay small edits in place; anything larger moves into a **Unity skill** it points at.
+_Avoid_: original, base skill
+
+**Unity skill**:
+A skill under `skills/unity/` that teaches one area of Unity mechanics (serialization, testing, ...), true for any Unity repo. It never holds facts about a specific repo.
+_Avoid_: Unity primitive, Unity module
+
+**Unity router**:
+The `unity` skill: the one entry point **Upstream skills** call for Unity knowledge. It routes to the right **Unity skill** and to the repo's **Unity config**.
+
+**Unity config**:
+`docs/agents/unity.md` in a consuming repo, written by setup: how *this* repo compiles, tests, and validates, and where its own Unity conventions live.
+_Avoid_: unity setup, discovery
+
 ## Relationships
 
 - An **Issue tracker** holds many **Issues**
 - An **Issue** carries one **Triage role** at a time
 - A **Decision ticket** is an **Issue** (a child of a `wayfinder:map`)
+- An **Upstream skill** reaches Unity knowledge only through the **Unity router**
+- The **Unity router** reads the **Unity config** for repo facts and a **Unity skill** for mechanics
 
 ## Flagged ambiguities
 
