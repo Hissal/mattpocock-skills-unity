@@ -194,3 +194,11 @@ Package docs are versioned separately from the Editor; checked against Addressab
 - Whether to recommend agents run `ForceReserializeAssets` (it touches many files and needs the Editor) or leave re-saving to humans.
 - How strongly to forbid raw YAML edits, given Unity's own DLL-migration example does a find-and-replace on `m_Script`.
 - Whether the skill should branch on Unity version (6.6 dictionaries and analyzer) by reading `ProjectSettings/ProjectVersion.txt`.
+
+## Answers from the skill design
+
+Added after [Design unity-serialization](https://github.com/Hissal/mattpocock-skills-unity/issues/9) resolved; the research above stands as written. The [resolution](https://github.com/Hissal/mattpocock-skills-unity/issues/9#issuecomment-5795568716) holds the full design; each answer here is its gist.
+
+- **`ForceReserializeAssets`:** the agent never runs it unprompted. A field rename ships with `FormerlySerializedAs` in one commit; a second commit, only on the user's okay, reserializes the affected files and removes the attribute. The agent proposes the file list first, built by an Editor script shipped with the skill. New fact behind this: `ForceReserializeAssets()` rewrites the whole project, while `ForceReserializeAssets(IEnumerable<string> assetPaths, ForceReserializeAssetsOptions options)` rewrites only the listed files, so a scoped run is light. ([ForceReserializeAssets, 6000.0](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/AssetDatabase.ForceReserializeAssets.html))
+- **Raw YAML edits:** a careful, validated operation, not a ban. The order of preference is the Editor, then an `AssetDatabase`/`SerializedObject` script, then a surgical text edit: line-level find-and-replace on known files, never round-tripped through a YAML library (for example a project-wide GUID swap repairing references). Structural edits prefer the Editor and are allowed without one when simple. Every text edit is followed by validation, or reported as unvalidated.
+- **Version branching:** yes. A version-gated rule states its gate inline, and the agent reads `ProjectSettings/ProjectVersion.txt` when the gate matters; the version is not copied into the Unity config.
