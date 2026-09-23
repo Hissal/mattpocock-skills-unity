@@ -2,6 +2,13 @@ This repo is an unofficial fork of `mattpocock/skills` (git remote `upstream`), 
 
 `research/` archives the cited research behind the Unity adaptation, one file per area. Read the matching file before changing a Unity skill or a Unity delta, and when a finding goes stale, update the file rather than working around it.
 
+Check a Unity mechanic hands-on in `unity-sandbox/` before a skill states it as fact: a gitignored, local-only Unity project (URP blank, with the Test Framework and `com.unity.pipeline`, plus one EditMode smoke test). Anything goes in it; nothing in it is committed. If it is missing, recreate it with the Unity CLI (`unity skill show` documents it):
+
+```bash
+unity projects create unity-sandbox --path . --editor-version <latest installed> --template com.unity.template.urp-blank --no-cloud
+unity pipeline install --project-path unity-sandbox
+```
+
 Skills are organized into bucket folders under `skills/`:
 
 - `engineering/`: daily code work

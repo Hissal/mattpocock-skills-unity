@@ -1,2 +1,5 @@
 node_modules
 .claude
+
+# Local Unity sandbox for checking mechanics hands-on; never committed
+/unity-sandbox/
