@@ -88,3 +88,9 @@ Off the main flow entirely.
 ## Precondition
 
 **`/setup-matt-pocock-skills`**: run before your first engineering flow to configure the issue tracker, triage labels, and doc layout the other skills assume. Custom issue trackers also work.
+
+## Unity
+
+In a Unity repo the flows above hold as they are: each skill pulls in the Unity mechanics it needs through `unity` itself, so there is nothing to route by hand. `/setup-matt-pocock-skills` records the repo's Unity facts in the Unity config (`docs/agents/unity.md`); without it, the Unity skills fall back to stated defaults.
+
+- **`/unity`**: a Unity question no line above fits. It finds the Unity project, reads the Unity config, and names any need no Unity skill covers yet.
