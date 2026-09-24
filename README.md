@@ -5,7 +5,7 @@ An unofficial fork of [Matt Pocock's skills](https://github.com/mattpocock/skill
 The upstream skills are small, composable engineering procedures. This fork keeps them, and changes only the ones whose procedure assumes a conventional code project where Unity behaves differently (compilation, EditMode and PlayMode tests, serialized assets, `.meta` GUIDs, scenes and prefabs). Upstream changes are merged in periodically.
 
 > [!NOTE]
-> The Unity adaptation is in progress. Until it lands, the skills below are upstream's, unchanged.
+> The Unity adaptation is in progress. The Unity section below grows as each Unity skill lands; until the adaptation is done, the other skills are upstream's, unchanged.
 
 Upstream's introduction follows, lightly edited for the fork's install route.
 
