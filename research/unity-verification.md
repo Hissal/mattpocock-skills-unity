@@ -52,7 +52,7 @@ Verification-relevant commands (all from the embedded skill, 1.0.0-beta.9, `refe
 - `unity run <project> --command <name>`: boots batch editor, runs one `[CliCommand]` from `com.unity.pipeline`, prints the result, exits; reuses an already-open editor on that project instead of spawning one.
 - Global: `--format json` envelopes with `success` and `errors[0].code`; exit codes 0/1/2 (bad args)/3 (auth)/4 (precondition, for example no licence)/6/8. SKILL.md: <https://github.com/Unity-Technologies/skills/blob/main/skills/unity-cli/SKILL.md>
 
-Project lock through the CLI: `unity test` and `unity build` documentation does not say what happens when a GUI editor already holds the project. **Unverified**; expect the same batchmode refusal as section 6.
+Project lock through the CLI: `unity test` and `unity build` documentation does not say what happens when a GUI editor already holds the project. **Observed** for `unity test` (section 11, check 1): it refuses in about 3 s with exit 6 and does not reuse the open editor. `unity build` is still **unverified**; expect the same refusal.
 
 ## 3. Compile-only paths (Roslyn against generated csproj)
 
@@ -94,7 +94,7 @@ Two official routes, one of them now deprecated.
 - "If a project is already open in another Editor instance, you cannot open it in batch mode"; only one instance may hold a project. <https://docs.unity3d.com/6000.0/Documentation/Manual/EditorCommandLineArguments.html> (6000.0). The user-facing error is "It looks like another Unity instance is running with this project open" (Unity Discussions threads; the lock file name `Temp/UnityLockfile` is from community posts and is **unverified** in Unity docs).
 - Consequence for the ladder: when a GUI editor is open, the batchmode rungs are unavailable for that checkout. Either drive the open editor (section 5), ask the user to close it, or run batch in a separate checkout with its own `Library`.
 - `unity run --command` is the one CLI path documented to reuse an open editor instead of failing. CLI `build-run-test.md`, link in section 2.
-- Detection: `unity status --format json` returns `STATUS_NO_INSTANCES` when no Pipeline-enabled GUI editor is open (observed); it cannot see an editor without the Pipeline package or a batchmode editor, so it is a positive signal only.
+- Detection: `unity status --format json` returns `STATUS_NO_INSTANCES` (exit 6) when no Pipeline-enabled editor is open (observed, section 11 check 5); it cannot see an editor without the Pipeline package, so it is a positive signal only. A resident headless editor with Pipeline **is** listed (section 5).
 
 ## 7. Licensing for headless, cloud and CI use
 
@@ -139,7 +139,26 @@ Suggested ladder, cheapest first; stop at the first rung that can catch the fail
 
 Fields the per-repo config likely needs (derived from the findings above, not from a source): editor version source (`ProjectSettings/ProjectVersion.txt`); project path inside the repo; whether `com.unity.pipeline` is installed; the repo's text-check command; compile-only command if any; test assemblies or filters for EditMode and PlayMode; build targets and build method or profile; licence type available locally and in CI; where CI runs and which workflow is authoritative; whether a warmed checkout exists; which environments may launch an editor at all.
 
-Open questions (unverified): behaviour of `unity test` / `unity build` when a GUI editor holds the project; whether `unity license activate --personal` works unattended in a fresh container; Build Server licence terms for test runs; a supported, documented command to regenerate csproj files headlessly.
+Open questions (unverified): behaviour of `unity build` when a GUI editor holds the project (`unity test` is answered in section 11); whether `unity license activate --personal` works unattended in a fresh container; Build Server licence terms for test runs; a supported, documented command to regenerate csproj files headlessly.
+
+## 11. Sandbox checks for the `unity-verification` skill
+
+The six checks the design ([#11](https://github.com/Hissal/mattpocock-skills-unity/issues/11)) requires, plus what surfaced while running them. All **observed** on 2026-09-24 in `unity-sandbox/` (6000.6.2f1, `com.unity.pipeline` 0.7.0-exp.1, CLI 1.0.0-beta.11, Windows 11). Exit codes were read without a pipe in between.
+
+1. **`unity test` while a GUI editor holds the project**: refused in about 3 s, exit **6**, message "The project at ... is already open in a running Editor (PID n). Close it and run the command again." No results XML; the open editor was untouched and not reused. So the batch rungs need the connected editor, a separate checkout, or the user.
+2. **`unity test` with a filter matching nothing**: exit **0**, and the results XML says `result="Passed" total="0"`. A lowercase filter (`smoketest`) against the class `SmokeTest` also matched nothing and exited 0, while `SmokeTest` matched 1: the filter is case-sensitive and a miss is silent. Through a connected editor, `run_tests --filter` with no match also returns `success: true` and `Summary.Total: 0`.
+3. **Resident headless editor** (the editor binary with `-batchmode -nographics -projectPath`, no `-quit`): listed by `unity status` as `ready` within seconds (warm `Library`); `unity command --project-path <p> recompile` answered `up_to_date`; `run_tests --mode editor` returned the suite's result; `run_script` calling `EditorApplication.Exit(0)` ended the process with exit 0 and `unity status` then returned `STATUS_NO_INSTANCES`. The `run_script` call that triggered the exit itself failed with `COMMAND_FAILED` "Invalid response format from Pipeline server", because the editor quit before replying: expected, not a failure of the stop.
+4. **A compile error in batch mode**: `unity test` exited **6**, wrote no results XML, and printed only "Scripts have compiler errors" plus "Unity exited with code 1 before reporting results"; the `error CS0029` lines were in `<project>/Logs/Editor.log`, not in the CLI output. A plain batch import (`unity run <project> -- -logFile <path>`) exited **6** ("Unity process exited with code 1"), printed each `CS` error in its summary, and the `-logFile` held `error CS0029` lines and "Scripts have compiler errors".
+5. **`unity status` with no Pipeline editor open**: `STATUS_NO_INSTANCES`, `success: false`, exit **6**.
+6. **`run_script --dry_run true`** on one file outside `Assets/` (a project-relative path): a clean file returned "Compiled successfully (dry run; nothing was loaded or executed)"; a file with a type error returned `result.success: false`, `error: "Compilation Failed"` and a `diagnostics` entry with `id: CS0029`, message, line and column. The reported line was 2 for an error on the file's third line, so it looks 0-based (one sample). The CLI exited **0** and the envelope said `success: true` in both cases: only `result.success` and `diagnostics` carry the verdict.
+
+Found alongside (GUI editor with Pipeline, same versions):
+
+- **`unity command ... recompile` does not wait.** On the GUI editor it returned `status: compiling` ("Recompilation started. Poll recompile_status until completed.") with exit 0, even with a compile error present. `run_tests` sent straight after ran the **stale** assemblies: a newly added failing test was absent (`Total: 0`), and a project with a compile error reported the old suite green. `recompile_status` afterwards showed `completed`, `compilationFailed: true` and the `error CS` line. The top-level **`unity recompile --project-path <p>`** waits (default timeout 120 s) and exits **6** on a compile error with a structured `errors` array (`code`, `file`, `line`, `column`, `message`), 0 when clean. On the resident headless editor of check 3, `unity command recompile` came back `up_to_date` directly, so the async return may depend on the editor having work to do; either way the blocking form is the safe one.
+- **`run_tests` exits 0 on a failing test.** A deliberately failing test returned CLI exit 0, envelope `success: true`, and `Summary.Failed: 1` with the test's `Status: "Failed"`. The verdict is in `Summary`, never in the exit code or the envelope.
+- **`unity test` with a failing test** exited **8**; the XML said `total="2" passed="1" failed="1"`.
+- **`-executeMethod` failure through `unity run`**: a method calling `EditorApplication.Exit(3)` gave CLI exit **6** and the last line "Unity process exited with code 3."; a method that throws gave exit **6** and "code 1". Both outputs also carried `[license] [Licensing::Module] Error: Access token is unavailable; failed to update`, although the licence was fine and the method ran: a licensing error line alone is not a licence failure.
+- A batch run of the one-test EditMode suite on a warm `Library` took about 60 s wall clock (`unity test`, editor start to exit); the same suite through a connected editor took under 3 s.
 
 ## Real-world example (not generic guidance)
 

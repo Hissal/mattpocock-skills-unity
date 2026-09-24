@@ -93,4 +93,5 @@ Off the main flow entirely.
 
 In a Unity repo the flows above hold as they are: each skill pulls in the Unity mechanics it needs through `unity` itself, so there is nothing to route by hand. `/setup-matt-pocock-skills` records the repo's Unity facts in the Unity config (`docs/agents/unity.md`); without it, the Unity skills fall back to stated defaults.
 
+- **`unity-verification`**: checking a Unity change really compiles and works, when Unity cannot run here or the editor is open, or when you want to know what "verified" covered and what stayed unvalidated.
 - **`/unity`**: a Unity question no line above fits. It finds the Unity project, reads the Unity config, and names any need no Unity skill covers yet.
