@@ -22,6 +22,14 @@ A canonical state-machine label applied to an **Issue** during triage (e.g. `nee
 A skill that also exists in `mattpocock/skills`. Its Unity changes stay small edits in place; anything larger moves into a **Unity skill** it points at.
 _Avoid_: original, base skill
 
+**Unity delta**:
+The fork's change to an **Upstream skill** (or other upstream file): small, in place, and kept across every **Upstream sync**. Git is its record: the diff against upstream shows every Unity delta and nothing else.
+_Avoid_: patch, override
+
+**Upstream sync**:
+Merging `mattpocock/skills` into the fork, as a merge commit that keeps every **Unity delta** and leaves the fork's own versioning untouched.
+_Avoid_: rebase, upstream update
+
 **Unity repo**:
 A repo holding a Unity project or a UPM package: the only kind of repo the Unity changes apply to.
 _Avoid_: Unity project (that is one of the two shapes, not the whole)
