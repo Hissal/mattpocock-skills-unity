@@ -34,7 +34,7 @@ _Avoid_: Unity primitive, Unity module
 The `unity` skill: the one entry point **Upstream skills** call for Unity knowledge. It routes to the right **Unity skill** and to the repo's **Unity config**.
 
 **Unity config**:
-`docs/agents/unity.md` in a consuming repo, written by setup: how *this* repo compiles, tests, and validates, and where its own Unity conventions live.
+`docs/agents/unity.md` in a consuming repo, written by setup: this repo's Unity facts and policies where they differ from the Unity skills' defaults, and pointers to where its own Unity conventions live. Never a copy of those conventions.
 _Avoid_: unity setup, discovery
 
 **Verification ladder**:
