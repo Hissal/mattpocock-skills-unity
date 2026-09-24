@@ -28,6 +28,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `.scratch/`: a sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
 - Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. These are present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
+- Unity repo signals: `ProjectSettings/ProjectVersion.txt`, or a `package.json` with a top-level `unity` field, at the root or below it. Found one? Also explore as [unity-setup.md](./unity-setup.md) says. None means skip everything Unity without mentioning it, even in the findings.
 
 ### 2. Present findings and ask
 
@@ -59,6 +60,8 @@ The defaults are the five canonical roles, each label string equal to its name: 
 **Section C: Domain docs.** Default to **single-context** (one `CONTEXT.md` + `docs/adr/` at the repo root). This fits almost every repo; write it without asking.
 
 Offer **multi-context** (a root `CONTEXT-MAP.md` pointing to per-context `CONTEXT.md` files) only when exploration found monorepo signals. Then confirm which layout they want.
+
+**Section D: Unity.** Only in a Unity repo: follow [unity-setup.md](./unity-setup.md), which confirms the Unity facts in one list, asks the Unity policies as one question, and drafts `docs/agents/unity.md` from the seed [unity.md](./unity.md).
 
 ### 3. Confirm and edit
 
@@ -100,6 +103,8 @@ The block:
 ```
 
 Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted.
+
+In a Unity repo, end the block with a `### Unity` sub-block: a one-line summary of the Unity project path(s) and shape, then ``See `docs/agents/unity.md`.`` Anywhere else, leave it out without comment.
 
 Then write the docs files using the seed templates in this skill folder as a starting point:
 

@@ -6,6 +6,8 @@ Those files are the only thing that varies between repos. The skills themselves 
 
 It is a prompt-driven skill, not a deterministic script. It reads your `git remote`, your existing `CLAUDE.md`, your existing `CONTEXT.md`, proposes what it found, and waits for you to confirm before writing anything.
 
+In a Unity repo it also writes the Unity config, `docs/agents/unity.md`: where the Unity project sits, which of your own docs hold your Unity conventions, and how Unity checks may run here, each recorded only where it differs from the [Unity skills](https://github.com/Hissal/mattpocock-skills-unity/tree/main/skills/unity)' defaults. It finds the facts itself and shows them as one list to correct, then asks one "keep the defaults?" question for the policies. In any other repo, nothing Unity appears.
+
 ## When to reach for it
 
 You invoke this by typing `/setup-matt-pocock-skills`; the [agent](https://www.aihero.dev/ai-coding-dictionary/agent) won't reach for it on its own. It is deliberately marked non-invokable, so no other skill can fire it for you.
@@ -80,6 +82,10 @@ Not today. There is an open request for exactly this from someone running the sk
 **Isn't it strange to have a skill that configures the other skills?**
 
 One long-standing complaint says yes, in these words: *"having a skill to set up the other skill does not feel right to me: that means the LLM is configuring its own skills."* The trade is real and acknowledged: the alternative to a setup step is duplicating tracker instructions into every skill that touches issues. The output is inspectable, editable markdown, which is the mitigation: you can read every file it wrote and change it by hand, and day-to-day tweaks are exactly that, not another run.
+
+**Why doesn't my Unity config list defaults?**
+
+Because a default copied into every repo stops being a default. Each Unity skill states its own defaults, and the config records only where this repo differs, so a missing field means the skill's default. When a skill's default improves, every repo that never overrode it gets the change without a re-run, and the config stays short enough to read as a list of what is unusual here. To see what could go in it, the [seed template](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/engineering/setup-matt-pocock-skills/unity.md) names every field, what it means and which skill owns it.
 
 ## It's working if
 

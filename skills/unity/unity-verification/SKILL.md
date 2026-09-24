@@ -22,7 +22,9 @@ This skill decides which check runs, where, and how to read its result. What to 
 **Rung rule:** find the lowest rung that can catch the failure the change risks, run every cheaper rung before it as a gate, and stop there. A change is verified up to the highest rung it passed.
 
 - **Compile** is a gate of each batch run, not a separate recurring check: a headless test run compiles first and fails on a compile error. With a connected editor, `unity recompile` is cheap enough to run more often.
-- **Player build** runs only when the change can break a build-only path (`#if` and `UNITY_EDITOR` branches, `UnityEditor` in a runtime assembly, stripping or IL2CPP, platform defines), or when the user asks.
+- **Player build** runs only when the change can break a build-only path (`#if` and `UNITY_EDITOR` branches, `UnityEditor` in a runtime assembly, stripping or IL2CPP, platform defines), or when the user asks. It builds the Unity config's build targets, with its build method or profile, when the config names them.
+- **Test filters**: the test rungs apply the Unity config's test filters, when it names any.
+- **Heavy runs**: a full suite, a PlayMode run or a player build starts without warning, unless the Unity config turns the heavy-run warning on; then ask the user first.
 - **Rung commands**: when the Unity config maps a rung to a repo command, run that command for the rung instead of the generic CLI path. A rung with no command falls back to the default. A compile-only (Roslyn) check is not a default rung; it runs only when a rung command names one.
 
 ## Where Unity runs
