@@ -7,7 +7,7 @@ description: Unity verification rules. Use when checking that a Unity change com
 
 This repo's Unity config (`docs/agents/unity.md`), if present, overrides these defaults.
 
-This skill decides which check runs, where, and how to read its result. What to test is `unity-testing`'s call; this skill runs it. For `unity` CLI syntax, run `unity skill show` (and `unity <command> --help`): the CLI is beta and moves every few weeks, so its syntax is never copied here.
+This skill decides which check runs, where, and how to read its result. What to test is `unity-testing`'s call; this skill runs it. For `unity` CLI syntax, run `unity skill show` and `unity <command> --help`: the CLI is beta and moves every few weeks, so the commands named in this skill mark the traps, and their current form comes from the CLI.
 
 ## The Verification ladder
 
@@ -29,7 +29,7 @@ This skill decides which check runs, where, and how to read its result. What to 
 
 Take the first environment available, in this order. [ENVIRONMENTS.md](ENVIRONMENTS.md) has detection, the capability table and the Safe Mode deadlock.
 
-1. **Connected editor**: an open editor with `com.unity.pipeline`, driven through `unity recompile` and `unity command --project-path <project>`. Fastest, and it holds the project lock, so it is the only route while the user's editor is open.
+1. **Connected editor**: an open editor with `com.unity.pipeline`, driven through `unity recompile` and `unity command --project-path <project>`. Fastest, and it holds the project lock, so it is the only route while the user's editor is open. Unity MCP is deprecated in favour of this CLI route; use it only where the CLI cannot run.
 2. **Headless**: `unity test`, `unity build`, `unity run`, when an editor is installed, no editor holds the project, the Unity config's allowed environments permit launching one, and a licence is available.
 3. **Neither**: run the text checks, then hand off: name what the user or CI should run.
 
@@ -53,7 +53,7 @@ Running C# in the Editor (a validation script, a probe, a scope script another U
 
 ## CI
 
-Leave pushing and triggering CI to the user. Name the rungs CI would cover and which workflow runs them (the Unity config's authoritative CI workflow, else "CI, if the repo has one"); those rungs stay unvalidated. If the user already pushed, read the run's result (`gh run view`) and report it as that rung.
+Leave pushing and triggering CI to the user. Name the rungs CI would cover and which workflow runs them (the Unity config's authoritative CI workflow, else "CI, if the repo has one"); those rungs stay unvalidated. If the user already pushed, read the run's result from the CI host (`gh run view` on GitHub Actions) and report it as that rung.
 
 ## Report
 
@@ -61,9 +61,9 @@ Every verification ends with a report:
 
 - **Ran**: each rung run, with the environment and the result (for tests, the counts).
 - **Skipped**: each rung the risk needed that did not run, with the reason: an environment gap (no editor, locked project, no licence, cold import declined, CI not triggered) or not needed for this risk.
-- **Unvalidated**: say "verified up to rung N", then list everything the risk needed above N as unvalidated (never "unverified").
+- **Unvalidated**: say "verified up to rung N", then list everything the risk needed above N as unvalidated.
 - **Manual checks**: what no rung can judge (feel, visuals, audio, timing), as concrete steps for the user.
 
 ## Slicing work into tickets
 
-A ticket's acceptance criteria name the highest rung it needs and whether that rung needs a connected editor. What runs where: text checks anywhere, including a cloud agent; compile and tests with a local editor, headless or connected; driving live scenes only with a connected editor; judging feel, visuals or a device only with a human (label those tickets `ready-for-human`). An agent claiming a ticket first checks it can reach the named rung, and passes the ticket up if it cannot, rather than claiming it done.
+A ticket's acceptance criteria name the highest rung it needs and whether that rung needs a connected editor. What runs where: text checks anywhere, including a cloud agent; compile and tests with a local editor, headless or connected; driving live scenes only with a connected editor; judging feel, visuals or a device only with a human (those tickets take the `ready-for-human` triage role). An agent claiming a ticket first checks it can reach the named rung, and passes the ticket up if it cannot, rather than claiming it done.
