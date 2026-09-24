@@ -47,6 +47,7 @@
     "./skills/productivity/writing-for-agents",
     "./skills/unity/unity",
     "./skills/unity/unity-verification",
-    "./skills/unity/unity-assemblies"
+    "./skills/unity/unity-assemblies",
+    "./skills/unity/unity-serialization"
   ]
 }

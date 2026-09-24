@@ -42,6 +42,12 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | Editor-only code, or `UnityEditor` in runtime code | unity-assemblies |
 | a compile error about a type that exists, or a Player build failing where the Editor compiles | unity-assemblies |
 | reviewing a change to asmdefs, defines or the Editor/runtime split | unity-assemblies |
+| changing a serialized field, type or enum | unity-serialization |
+| moving, renaming or deleting an asset or script | unity-serialization |
+| editing scene, prefab, `.asset` or `.meta` text | unity-serialization |
+| reviewing a change to serialized types or Unity assets | unity-serialization |
+| slicing Unity work into tickets | unity-serialization, unity-verification |
+| keeping asset churn out of a hotspot scan | unity-serialization |
 
 Rows land with the Unity skill that owns them, so the table names only skills that exist.
 
