@@ -33,6 +33,10 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 
 | Need | Unity skills |
 |---|---|
+| checking a change compiles or works before calling it done | unity-verification |
+| building a player | unity-verification |
+| running C# in the Editor | unity-verification |
+| Unity cannot run here, or the editor is locked | unity-verification |
 
 Rows land with the Unity skill that owns them, so the table names only skills that exist.
 
