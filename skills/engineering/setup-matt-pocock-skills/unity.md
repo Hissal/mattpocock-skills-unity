@@ -30,6 +30,13 @@ Owner: `unity-verification`.
 - **Authoritative CI workflow**: the workflow file whose result counts as the CI rung.
 - **Heavy-run warning**: whether to ask before a heavy run (a full suite, a PlayMode run or a player build) starts.
 
+## Testing
+
+Owner: `unity-testing`.
+
+- **Test assembly layout**: where a module's EditMode and PlayMode test assemblies go, and how they are named.
+- **Mocking library**: the mocking library tests use (NSubstitute, Moq and the like), if any.
+
 ## Assemblies
 
 Owner: `unity-assemblies`.

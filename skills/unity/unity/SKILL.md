@@ -33,15 +33,22 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 
 | Need | Unity skills |
 |---|---|
+| running the tests, or how often to | unity-testing, unity-verification |
 | checking a change compiles or works before calling it done | unity-verification |
 | building a player | unity-verification |
 | running C# in the Editor | unity-verification |
 | Unity cannot run here, or the editor is locked | unity-verification |
-| creating, moving or deleting a script folder, `.asmdef` or `.asmref` | unity-assemblies |
+| writing or changing a test | unity-testing |
+| setting up tests where none exist | unity-testing |
+| choosing which tests cover a change, or sketching test seams for a feature | unity-testing |
+| a test failing only under Unity | unity-testing |
+| reviewing a change to tests | unity-testing |
+| creating, moving or deleting a script folder, `.asmdef` or `.asmref` | unity-assemblies (+ unity-serialization when moving) |
 | editing assembly references or scripting defines | unity-assemblies |
 | Editor-only code, or `UnityEditor` in runtime code | unity-assemblies |
 | a compile error about a type that exists, or a Player build failing where the Editor compiles | unity-assemblies |
 | reviewing a change to asmdefs, defines or the Editor/runtime split | unity-assemblies |
+| designing a module's seams, or where the engine sits as a dependency | unity-testing, unity-assemblies |
 | changing a serialized field, type or enum | unity-serialization |
 | moving, renaming or deleting an asset or script | unity-serialization |
 | editing scene, prefab, `.asset` or `.meta` text | unity-serialization |
@@ -52,6 +59,7 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | writing code that runs on load, on a code reload, or on entering or exiting Play mode | unity-code-lifecycle |
 | state leaking between Play sessions, or a bug only on the second Play | unity-code-lifecycle |
 | reviewing a change that adds or changes statics or load code | unity-code-lifecycle |
+| scanning Unity code for architectural friction | unity-testing, unity-assemblies, unity-code-lifecycle, unity-serialization |
 
 Rows land with the Unity skill that owns them, so the table names only skills that exist.
 

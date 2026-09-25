@@ -49,6 +49,7 @@
     "./skills/unity/unity-verification",
     "./skills/unity/unity-assemblies",
     "./skills/unity/unity-serialization",
+    "./skills/unity/unity-testing",
     "./skills/unity/unity-code-lifecycle"
   ]
 }

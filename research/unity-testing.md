@@ -116,7 +116,7 @@ So in Edit mode tests, lifecycle methods on a plain MonoBehaviour never run. Eit
 Play mode variant: drop `"includePlatforms"` (empty means all platforms). `precompiledReferences` is ignored unless `overrideReferences` is true. [asmdef file format](https://docs.unity3d.com/6000.3/Documentation/Manual/assembly-definition-file-format.html). References can also be GUIDs (`"GUID:..."`), same page.
 
 - Selecting platforms other than Editor is what allows the assembly's Play mode tests to run on standalone players. [create a test assembly](https://docs.unity3d.com/6000.3/Documentation/Manual/test-framework/workflow-create-test-assembly.html)
-- Test assemblies are only included in a player build when `BuildOptions.IncludeTestAssemblies` is set or `PlayerSettings.playModeTestRunnerEnabled` (`TestBuildAssemblyFilter.cs`, bundled 1.6.0 source). The `UNITY_INCLUDE_TESTS` define constraint is the usual guard (meaning of that symbol in normal builds is **unverified** beyond this source reading).
+- Test assemblies are only included in a player build when `BuildOptions.IncludeTestAssemblies` is set or `PlayerSettings.playModeTestRunnerEnabled` (`TestBuildAssemblyFilter.cs`, bundled 1.6.0 source). The `UNITY_INCLUDE_TESTS` define constraint is the usual guard; a test assembly carrying it was observed left out of a normal Player build ([unity-assemblies.md](./unity-assemblies.md)).
 
 ## Writing tests: attributes and hooks
 
@@ -242,11 +242,25 @@ Measured (probe only, not a primary source): Unity 6000.3.20f1, empty project, W
 
 Test execution itself was milliseconds (XML `duration` about 0.04 s for the Edit mode suite). The fixed cost is Editor startup, refresh and compile, so it scales with project size, package count and whether `Library/` is warm (scaling claim **unverified** with numbers). For an agent loop this means: batch many tests per Editor launch, filter to what changed, prefer Edit mode `[Test]`, and when an Editor is already open, run through it (Test Runner or `TestRunnerApi`) instead of launching a second one, which batch mode refuses anyway.
 
+## Sandbox checks for the `unity-testing` skill
+
+The seven checks the design requires ([#10](https://github.com/Hissal/mattpocock-skills-unity/issues/10), check 7 from [#15](https://github.com/Hissal/mattpocock-skills-unity/issues/15)), run for [#32](https://github.com/Hissal/mattpocock-skills-unity/issues/32) in `unity-sandbox/` on 6000.6.2f1 (Test Framework 1.8.0, CLI 1.0.0-beta.11, Windows 11, Enter Play Mode Options on with domain and scene reload off, the 6.6 default). **Observed** on 2026-09-25 through `unity test` (cold batch launch), unless a check names the connected editor.
+
+1. **EditMode lifecycle**: `new GameObject().AddComponent<T>()` on a plain MonoBehaviour gave `Awake`, `OnEnable`, `Start`, `Update` all 0, both straight after `AddComponent` and after two `yield return null`; `Application.isPlaying` false. Calling the component's public method directly worked (the test passed). Same result as the 6000.3 probe above.
+2. **`WaitForSeconds` in an EditMode `[UnityTest]`**: `yield return new WaitForSeconds(1.5f)` resumed after **0 ms** (Stopwatch). It does not wait.
+3. **`Awaitable` as a test return type**: `[Test] public async Awaitable M()` ran its body to the end (both logs appeared, including the one after `await Awaitable.NextFrameAsync()`), then the test **failed** with `System.NullReferenceException` at `NUnit.Framework.Internal.AsyncInvocationRegion+AsyncTaskInvocationRegion.WaitForPendingOperationsToComplete`, not with the body's own `Assert.Fail`. Unsupported. `await Awaitable.NextFrameAsync()` inside `[Test] public async Task M()` passed.
+4. **PlayMode statics with Enter Play Mode Options on and off**: in a cold PlayMode run, a static incremented in test A read 1 in test B both with EPMO on (domain reload off) and with EPMO off (reload on): every test in a run shares one Play session, so reload never runs between tests either way. In EditMode, a static set in one test was still set in the next. **Across runs** in one persistent (GUI) editor, two consecutive EditMode runs of the same tests read hits 2 then 3: nothing reloads the domain between runs unless code recompiles. The PlayMode cross-run case in a persistent editor could not be observed (see the connected PlayMode quirk in [unity-verification.md](./unity-verification.md) section 11), so it follows from the lifecycle research rather than a test run.
+5. **Explicit asmdef templates on 6000.6**: the EditMode template and the PlayMode template (this file's shape, the module referenced by name) both compiled and ran. In the PlayMode test, `Awake` and `OnEnable` were 1 right after `AddComponent`, `Start` and `Update` 1 after one `yield return null`; after `Object.Destroy`, the object was non-null in the same frame and null after one frame. Same as on 6000.3.
+6. **Template-created project (URP blank) manifest**: a project created with `unity projects create ... --template com.unity.template.urp-blank --editor-version 6000.6.2f1` lists `com.unity.test-framework` 1.8.0 in `Packages/manifest.json`. Bare `-batchmode -createProject` (6000.3, above) does not, so the gap belongs to bare batchmode projects only.
+7. **Run-cost timing**: recorded in [unity-verification.md](./unity-verification.md) section 11.
+
+Found alongside, same run:
+
+- `Object.Destroy` in an EditMode `[Test]` logged "Destroy may not be called from edit mode! Use DestroyImmediate instead. Destroying an object in edit mode destroys it permanently", left the object non-null, and failed the test with "Unhandled log message". Same as on 6000.3.
+- In a plain `[Test]`, `LogAssert.Expect(LogType.Error, msg)` placed **after** the `Debug.LogError` still passed, as did placing it before: the whole synchronous body runs within one frame, before the end-of-frame check. The documented "before the code that logs" rule holds once a yield separates them: in a `[UnityTest]` that logs, yields one frame, then calls `LogAssert.Expect`, the test **failed** with "Unhandled log message"; with `Expect` first, it passed (connected editor).
+
 ## Open questions / unverified
 
 - Exact Test Framework version bundled in each 6000.0 patch.
-- Whether Hub project templates include `com.unity.test-framework` in the manifest.
-- Behaviour of runtime `YieldInstruction`s (e.g. `WaitForSeconds`) inside Edit mode `[UnityTest]`.
-- `Awaitable` as a test return type.
-- Play mode tests with Enter Play Mode Options (domain reload disabled): the runner just sets `EditorApplication.isPlaying = true` (`EnterPlayModeTask.cs`), so it presumably honours the project setting, but no doc states it.
+- Statics across two PlayMode test runs in one persistent editor with domain reload off (expected to persist; not observed, see check 4).
 - Run-time scaling on real projects.
