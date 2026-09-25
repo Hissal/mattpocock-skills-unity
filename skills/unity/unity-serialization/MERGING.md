@@ -9,7 +9,7 @@ A merge is always carried to its commit. A few conflicts **pause** it instead: l
 Stop on these, unless the task or the merge's goal gives a rule (an upstream sync where their side owns the art; a `.meta` GUID only one side's files reference, decidable by grep):
 
 1. A binary or LFS file changed on both sides.
-2. A structural scene or prefab conflict: reparenting (`m_Father`, `m_Children`), components added or removed (`m_Component`), `m_Modifications` entries, or an object one side deleted and the other edited.
+2. A structural scene or prefab conflict: reparenting (`m_Father`, `m_Children`), components added or removed (`m_Component`), or `m_Modifications` entries.
 3. A `.meta` `guid:` add/add: the same path added on both sides, each with its own GUID.
 4. A conflict on a lockable LFS path (`lockable` in `.gitattributes`). Report it even when a rule resolved it: the lock workflow was bypassed. Leave locks to their owners.
 5. A GUID collision: two different assets whose `.meta` files share a `guid:`.
@@ -23,7 +23,7 @@ Stops are **batched**: resolve everything else first, then one ask listing each 
 - **Git state, not markers.** `git diff --name-only --diff-filter=U` lists every unmerged path. A Smart-Merged file carries no conflict markers, so a marker grep misses it.
 - **Did the driver run?** `git check-attr merge -- <path>` names the file's merge driver, and `git config --get merge.<driver>.driver` its command. Detect it; leave git config as it is, and name a missing or broken driver in the final report.
   - **Command defined and its exe exists**: Smart Merge ran. The file holds its partial merge, with no markers (with `-p`, their side of each conflicted property).
-  - **Command defined, exe missing** (a stale editor path): Git marks **every** file with that attribute unmerged, even ones with no overlapping change, and each holds our side untouched with no markers (observed on Git 2.5x). Nothing was merged: run Smart Merge by hand on each.
+  - **Command defined, exe missing** (a stale editor path): Git marks **every** file with that attribute unmerged, even ones with no overlapping change, and each holds our side untouched with no markers (observed on Git 2.55). Nothing was merged: run Smart Merge by hand on each.
   - **No command**: Git line-merged the file, and it has markers.
 - **Rebase swaps the sides.** During a rebase, stage 2 (`--ours`) is the branch being rebased onto and stage 3 (`--theirs`) is your commit being replayed. Read which side the file holds before calling it resolved.
 
@@ -47,7 +47,7 @@ git show :1:<path> > base; git show :2:<path> > ours; git show :3:<path> > their
 '<UnityYAMLMerge>' merge -h --force --fallback none -o report.txt --describe base theirs ours merged
 ```
 
-- Every call starts `merge -h`: without `-h`, and before it, an error opens a modal dialog and the call blocks until a human closes it. `--fallback none` keeps a conflict from launching a GUI merge tool.
+- Every call starts `merge -h`, in that order: with `-h` missing, or placed before `merge`, an argument error opens a modal dialog and the call blocks until a human closes it. `--fallback none` keeps a conflict from launching a GUI merge tool.
 - Argument order is base, **theirs**, **ours**, dest. During a rebase, swap stages 2 and 3.
 - **Exit 0**: clean; `merged` holds both sides. Copy it over the path and `git add`.
 - **Exit 2**: conflicts. `report.txt` lists each one as `Left <fileID>.<Class>.<property> change to <theirs>` and `Right ... change to <ours>`. `merged` holds everything else merged and the **base** value for each conflicted property, with no markers. Set each conflicted property with a surgical edit ([UNITYYAML.md](UNITYYAML.md)), then copy it over the path and `git add`. A conflicted property on the structural list above is a stop.

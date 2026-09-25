@@ -182,7 +182,7 @@ Conflict shapes and rules:
 
 ## 8. Sandbox checks (6000.6.2f1)
 
-The four checks the `MERGING.md` claims rest on, run for [#40](https://github.com/Hissal/mattpocock-skills-unity/issues/40) on 2026-09-25 with Unity 6000.6.2f1 (its bundled `UnityYAMLMerge.exe`), Git for Windows 2.5x, in `unity-sandbox/` and a scratch Git repo. All [tool].
+The four checks the `MERGING.md` claims rest on, run for [#40](https://github.com/Hissal/mattpocock-skills-unity/issues/40) on 2026-09-25 with Unity 6000.6.2f1 (its bundled `UnityYAMLMerge.exe`), Git for Windows 2.55.0, in `unity-sandbox/` and a scratch Git repo. All [tool].
 
 1. **The manual stage rerun works.** A copy of the URP blank `SampleScene.unity`, both sides renaming the same GameObject, merged by Git with no driver (markers present). `git show :1:/:2:/:3:` into base, ours, theirs, then `merge -h --force --fallback none -o report.txt --describe base theirs ours out`: exit 2, no markers in `out`, the conflicted `m_Name` left at the base value, and the report lists `Left <fileID>.GameObject.m_Name change to <theirs>` / `Right ... change to <ours>`. With `-p`: exit 2, `out` holds theirs. Different properties changed on each side: exit 0, both merged. A `.controller` without `--force`: exit 1, `Don't know how to merge controller files`, dest untouched. Same results as 6000.3.20f1 (section 2).
    - With a local driver (`merge -h -p --force --fallback none %O %B %A %A`) and `merge=unityyamlmerge` on `*.unity`: Git reports `CONFLICT (content)` and `UU`, the file has no markers and holds theirs for the conflicted property.
