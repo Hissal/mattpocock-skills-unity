@@ -159,6 +159,7 @@ Found alongside (GUI editor with Pipeline, same versions):
 - **`unity test` with a failing test** exited **8**; the XML said `total="2" passed="1" failed="1"`.
 - **`-executeMethod` failure through `unity run`**: a method calling `EditorApplication.Exit(3)` gave CLI exit **6** and the last line "Unity process exited with code 3."; a method that throws gave exit **6** and "code 1". Both outputs also carried `[license] [Licensing::Module] Error: Access token is unavailable; failed to update`, although the licence was fine and the method ran: a licensing error line alone is not a licence failure.
 - A batch run of the one-test EditMode suite on a warm `Library` took about 60 s wall clock (`unity test`, editor start to exit); the same suite through a connected editor took under 3 s.
+- **A reference cycle** (observed during the `unity-assemblies` checks, [research/unity-assemblies.md](unity-assemblies.md) section 13): `unity recompile --json` exited 0 with `compilationFailed: true` and an empty `errors` array; the cycle was named only in the console.
 
 ## Real-world example (not generic guidance)
 

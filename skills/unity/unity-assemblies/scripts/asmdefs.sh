@@ -14,9 +14,10 @@
 # skips folders Unity ignores (hidden, or ending in "~"). Registry and git
 # packages exist only in Library/PackageCache/: without it, their assemblies
 # are missing and references to them print as unresolved, which the script
-# says on stderr.
+# says on stderr. Local packages outside the root ("file:" paths in
+# Packages/manifest.json) are not scanned either; the script names them on stderr.
 #
-# Needs bash, grep and sed only. Grep the output either way:
+# Needs bash and grep only. Grep the output either way:
 #   asmdefs.sh | grep -F "$(printf 'My.Assembly\t')"   name to guid
 #   asmdefs.sh | grep -F "<guid>"                          guid to name
 
@@ -35,6 +36,14 @@ else
   echo "asmdefs.sh: no Library/PackageCache here, so registry and git package assemblies are not listed and references to them print as unresolved." >&2
 fi
 [ ${#dirs[@]} -eq 0 ] && dirs=(.)
+
+if [ -f Packages/manifest.json ]; then
+  while IFS= read -r dep; do
+    case $dep in
+      '"file:../'*|'"file:/'*|'"file:'?:*) echo "asmdefs.sh: local package $dep is outside this root and not scanned; references into it print as unresolved." >&2 ;;
+    esac
+  done < <(grep -o '"file:[^"]*"' Packages/manifest.json)
+fi
 
 tab=$'\t'
 nl=$'\n'
@@ -60,11 +69,11 @@ while IFS= read -r file; do
   name=
   [[ $content =~ \"name\"[[:space:]]*:[[:space:]]*\"([^\"]*)\" ]] && name=${BASH_REMATCH[1]}
 
-  list=
+  reflist=
   if [[ $content =~ \"references\"[[:space:]]*:[[:space:]]*\[([^]]*)\] ]]; then
     rest=${BASH_REMATCH[1]}
     while [[ $rest =~ \"([^\"]*)\" ]]; do
-      list+="${list:+,}${BASH_REMATCH[1]}"
+      reflist+="${reflist:+,}${BASH_REMATCH[1]}"
       rest=${rest#*"${BASH_REMATCH[0]}"}
     done
   fi
@@ -79,7 +88,7 @@ while IFS= read -r file; do
   names+=("$name")
   guids+=("$guid")
   paths+=("$file")
-  refs+=("$list")
+  refs+=("$reflist")
 done < <(grep -rl --include='*.asmdef' '' "${dirs[@]}" 2>/dev/null)
 
 # Lookup tables as newline-framed strings (bash 3.2 has no associative arrays).
@@ -93,23 +102,23 @@ done
 for i in "${!names[@]}"; do
   out=
   IFS=, read -r -a items <<< "${refs[$i]}"
-  for r in ${items[@]+"${items[@]}"}; do
-    case $r in
+  for ref in ${items[@]+"${items[@]}"}; do
+    case $ref in
       GUID:*)
-        g=${r#GUID:}
+        ref_guid=${ref#GUID:}
         case $by_guid in
-          *"$nl$g$tab"*)
-            n=${by_guid#*"$nl$g$tab"}
-            r=${n%%"$nl"*} ;;
-          *) r="?$r" ;;
+          *"$nl$ref_guid$tab"*)
+            after=${by_guid#*"$nl$ref_guid$tab"}
+            ref=${after%%"$nl"*} ;;
+          *) ref="?$ref" ;;
         esac ;;
       *)
         case $by_name in
-          *"$nl$r$nl"*) ;;
-          *) r="?$r" ;;
+          *"$nl$ref$nl"*) ;;
+          *) ref="?$ref" ;;
         esac ;;
     esac
-    out+="${out:+,}$r"
+    out+="${out:+,}$ref"
   done
   printf '%s\t%s\t%s\t%s\n' "${names[$i]}" "${guids[$i]}" "${paths[$i]}" "$out"
 done

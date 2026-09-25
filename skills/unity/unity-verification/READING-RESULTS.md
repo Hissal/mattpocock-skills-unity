@@ -31,6 +31,7 @@ A batch `-executeMethod` fails with editor exit 1 when the method throws, or wit
 ## Compile results
 
 - **`unity recompile --project-path <project>`** waits for the compile and exits 6 with an `errors` array (`code`, `file`, `line`, `column`, `message`) on failure, 0 when clean. Use it before any connected test run.
+- **A reference cycle between assemblies** fails the compile without an entry in `errors`: `unity recompile` exited 0 with `compilationFailed: true` and an empty `errors` array, and the cycle was named only in the console. Read `compilationFailed` as well as the exit code.
 - **`unity command ... recompile`** can return `status: compiling` and exit 0 before compiling finishes. A `run_tests` sent straight after runs the old assemblies: new tests are missing and a broken project can report green. If you use this form, poll `recompile_status` until `completed` or `up_to_date` and read `compilationFailed` and `errors` before running tests.
 - **`run_script --dry_run true`** compiles one file in memory. The CLI exits 0 and the envelope says `success: true` whether or not it compiled: the verdict is `result.success` and `result.diagnostics` (each with `id` such as `CS0029`, `message`, `line`, `column`; the line looked 0-based in one sample, so confirm it against the source). It checks that one file against the loaded assemblies, not the project's compile.
 

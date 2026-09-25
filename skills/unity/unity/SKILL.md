@@ -37,7 +37,7 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | building a player | unity-verification |
 | running C# in the Editor | unity-verification |
 | Unity cannot run here, or the editor is locked | unity-verification |
-| creating, moving or deleting a script folder, `.asmdef` or `.asmref` | unity-assemblies (+ unity-serialization when moving) |
+| creating, moving or deleting a script folder, `.asmdef` or `.asmref` | unity-assemblies |
 | editing assembly references or scripting defines | unity-assemblies |
 | Editor-only code, or `UnityEditor` in runtime code | unity-assemblies |
 | a compile error about a type that exists, or a Player build failing where the Editor compiles | unity-assemblies |

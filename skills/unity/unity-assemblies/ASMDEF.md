@@ -31,7 +31,7 @@ A runtime assembly with every field at its default except the ones commented:
 |---|---|---|---|
 | `name` | required | The compiled assembly's name. | Renaming the `.asmdef` file leaves `name` unchanged. Name references and `InternalsVisibleTo` strings use `name`. |
 | `rootNamespace` | empty | The namespace IDEs put in new scripts. | Changes nothing at compile time. |
-| `references` | `[]` | Assemblies this one may use, as `"GUID:<guid>"` or a name. | A reference that matches no assembly is dropped without an error or warning (observed on 6000.6.2f1); it fails only when code uses a type from it. Predefined assemblies (`Assembly-CSharp`) are dropped the same way. |
+| `references` | `[]` | Assemblies this one may use, as `"GUID:<guid>"` or a name. | A reference that matches no assembly is dropped without an error or warning (observed on 6000.6.2f1); it fails only when code uses a type from it. |
 | `includePlatforms` / `excludePlatforms` | `[]` | Where the assembly compiles. `["Editor"]` makes it Editor-only. | Only one of the two may be non-empty. Only platforms with installed build support are valid. |
 | `allowUnsafeCode` | `false` | Allows `unsafe` code. | |
 | `autoReferenced` | `true` | Whether the predefined assemblies (`Assembly-CSharp` and its siblings) see this one. | Has no effect on whether the assembly ships in a build, and never lets this assembly see `Assembly-CSharp`. |
@@ -65,7 +65,7 @@ AssemblyDefinitionImporter:
   assetBundleVariant: 
 ```
 
-`guid` is 32 lowercase hex characters, freshly generated (for example a UUID with its dashes removed); never reuse one. An `.asmref` uses `AssemblyDefinitionReferenceImporter:` in place of `AssemblyDefinitionImporter:`. Unity keeps a hand-written GUID in either (observed). Write the `.meta` and its asset in one command, `.meta` first, then re-read the `.meta` (see the GUID rule in `SKILL.md`).
+`guid` is 32 lowercase hex characters, freshly generated (for example a UUID with its dashes removed); never reuse one. An `.asmref` uses `AssemblyDefinitionReferenceImporter:` in place of `AssemblyDefinitionImporter:`. Unity keeps a hand-written GUID in either (observed), when written per the GUID rule in `SKILL.md`.
 
 ## `versionDefines`
 
@@ -100,8 +100,6 @@ For `Unity`, write editor versions such as `[6000.0,6000.2)`; release types orde
 
 Entries are ANDed. `!` negates a symbol; `||` inside one entry means either. Built-in symbols (`UNITY_EDITOR`, `UNITY_INCLUDE_TESTS`, platform symbols), project symbols and this assembly's own `versionDefines` all count. An invalid entry fails with "Invalid Define Constraint".
 
-The optional-package pattern is the two together: a `versionDefines` entry defines a symbol when the package is installed, and `defineConstraints` names that symbol, so the integration assembly compiles when the package is there and is left out entirely when it is not.
-
 ## Project-wide symbols
 
 Per Unity's documentation, three scopes add up:
@@ -110,4 +108,4 @@ Per Unity's documentation, three scopes add up:
 - Player Settings, Scripting Define Symbols: per platform. Applying recompiles.
 - A build profile's own define list: per profile.
 
-`PlayerSettings.SetScriptingDefineSymbols` reaches Editor scripts only after the Editor regains control and recompiles, so setting symbols and building in the same call builds without them. `BuildPlayerOptions.extraScriptingDefines` applies to that one Player build only. Batch mode has no way to recompile for changed symbols: a headless run gets its symbols from `csc.rsp` (or the saved settings) at startup.
+From script, `PlayerSettings.SetScriptingDefineSymbols` sets the Player Settings scope and `BuildPlayerOptions.extraScriptingDefines` adds symbols to one Player build only.

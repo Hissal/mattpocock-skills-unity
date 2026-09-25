@@ -33,4 +33,4 @@ Analyzer diagnostics show in the Editor console and in IDEs Unity supports; othe
 
 ## Unity's own
 
-Unity 6.5 and later ship analyzers and a generator for the code lifecycle attributes (`UAC0031`, `UAL0010` to `UAL0014`), switched per assembly with a `<asmdefName>.globalconfig` file. Those belong to `unity-code-lifecycle`: call the Skill tool with "unity-code-lifecycle" before writing or changing a `.globalconfig`.
+Unity 6.5 and later ship analyzers and a generator for the code lifecycle attributes (`UAC0031`, `UAL0010` to `UAL0014`), switched per assembly with a `<asmdefName>.globalconfig` file. Those, and any `.globalconfig`, are `unity-code-lifecycle`'s.
