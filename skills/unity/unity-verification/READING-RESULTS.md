@@ -26,6 +26,7 @@ A batch `-executeMethod` fails with editor exit 1 when the method throws, or wit
 - **`unity test`** writes NUnit XML (the `--output` path). Read the root `test-run` element's `total` and `failed`. `total="0"` is no verdict: the filter matched nothing, even though the exit code is 0. No XML at all means the run never reached the tests; read the log.
 - **Filters are case-sensitive**, and a filter that matches nothing fails silently (exit 0, `total="0"`). Copy test names exactly from the source or a previous results file.
 - **Connected `run_tests`** exits 0 and returns envelope `success: true` even when tests fail. Read `result.Summary`: `Total` above zero and `Failed` at zero. `Total: 0` is no verdict.
+- **Connected PlayMode `run_tests`** runs only asynchronously: a synchronous call returns `Total: 0` with the refusal in `result.error`, and in one editor session only the first `--async_tests` run was observed to execute, later ones reporting zero tests through `test_status`. A connected PlayMode `Total: 0` is no verdict: report PlayMode as unvalidated, or run it headless once no editor holds the project.
 - **Headless test runs never take `-quit`** alongside `-runTests`: it kills the run before the tests finish. `unity test` already leaves it off; this matters when a rung command or `unity run` passes editor arguments by hand.
 
 ## Compile results

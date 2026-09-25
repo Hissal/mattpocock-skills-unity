@@ -29,11 +29,11 @@ Write test assemblies in the explicit form below. The Editor's own templates and
 - `UNITY_INCLUDE_TESTS` in `defineConstraints` keeps the assembly out of normal player builds, which is also why production code in a test assembly vanishes from the Player.
 - Reference the module under test by `GUID:`, per `unity-assemblies`; the test runner assemblies by name, as above.
 
-Observed on 6000.6.2f1: the EditMode template compiles and runs (checked with a name reference to the module). The PlayMode template is not yet checked on 6000.6.
+Observed on 6000.6.2f1: both templates compile and run (checked with a name reference to the module).
 
 ## The test framework package
 
-`com.unity.test-framework` is a core package with its version fixed to the Editor's, but a project can still lack it: a project created with bare `-batchmode -createProject` has no entry, and test assemblies then fail to compile. Before the first test assembly, read `Packages/manifest.json`. When the entry is missing, propose adding it (the version the Editor bundles) and wait; adding a package is the user's call.
+`com.unity.test-framework` is a core package with its version fixed to the Editor's, but a project can still lack it: the URP blank template lists it, while a project created with bare `-batchmode -createProject` has no entry, and test assemblies then fail to compile. Before the first test assembly, read `Packages/manifest.json`. When the entry is missing, propose adding it (the version the Editor bundles) and wait; adding a package is the user's call.
 
 ## Setting up the first test assembly
 
