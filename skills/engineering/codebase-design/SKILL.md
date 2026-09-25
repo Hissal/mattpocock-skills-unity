@@ -94,6 +94,8 @@ Good interfaces make testing natural:
 
 3. **Small surface area.** Fewer methods = fewer tests needed. Fewer params = simpler test setup.
 
+In a Unity repo, call the Skill tool with "unity" for designing a module's seams: where the engine sits as a dependency and how to test across it, and seams that are also assembly boundaries.
+
 ## Relationships
 
 - A **Module** has exactly one **Interface** (the surface it presents to callers and tests).

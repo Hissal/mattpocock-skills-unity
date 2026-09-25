@@ -21,6 +21,7 @@ This command is _informed_ by the project's domain model and built on a shared d
 
 - If the user named a direction (a module, a subsystem, a pain point), take it, and skip the inference below.
 - Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots, the files and areas that keep coming up, and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
+- In a Unity repo, call the Skill tool with "unity" for keeping asset churn out of the hotspot scan, and tell the explorer sub-agent below to call it for scanning Unity code for architectural friction.
 
 Read the project's domain glossary (`CONTEXT.md`) and any ADRs in the area you're touching first.
 
