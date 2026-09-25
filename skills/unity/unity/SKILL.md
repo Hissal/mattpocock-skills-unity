@@ -48,6 +48,10 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | reviewing a change to serialized types or Unity assets | unity-serialization |
 | slicing Unity work into tickets | unity-serialization, unity-verification |
 | keeping asset churn out of a hotspot scan | unity-serialization |
+| adding or changing static state, a singleton or a static event | unity-code-lifecycle |
+| writing code that runs on load, on a code reload, or on entering or exiting Play mode | unity-code-lifecycle |
+| state leaking between Play sessions, or a bug only on the second Play | unity-code-lifecycle |
+| reviewing a change that adds or changes statics or load code | unity-code-lifecycle |
 
 Rows land with the Unity skill that owns them, so the table names only skills that exist.
 

@@ -132,6 +132,8 @@ From [custom scripting symbols](https://docs.unity3d.com/6000.0/Documentation/Ma
 
 ## 8. Domain reload, Enter Play Mode options, static state
 
+This section feeds the `unity-code-lifecycle` skill ([#33](https://github.com/Hissal/mattpocock-skills-unity/issues/33)), not `unity-assemblies`.
+
 ### Settings and defaults (this changed in Unity 6.6)
 
 - Location: Edit > Project Settings > Editor > Enter Play Mode Settings > "When entering Play Mode": Reload Domain and Scene, Reload Scene only, Reload Domain only, Do not reload Domain or Scene. [6.0 config](https://docs.unity3d.com/6000.0/Documentation/Manual/configurable-enter-play-mode.html)
@@ -161,10 +163,10 @@ With scene reload off, objects are not recreated and constructors are not re-run
 - `[AutoStaticsCleanup]` details, from the [6.6 API page](https://docs.unity3d.com/6000.6/Documentation/ScriptReference/Unity.Scripting.LifecycleManagement.AutoStaticsCleanupAttribute.html) and the 6.6 domain reload page (read 2026-09-23):
   - No per-assembly opt-in: code generation defaults to true, so a `.globalconfig` is only needed to turn generation off or the analyzer on. Unity does not write one.
   - Applies to classes, structs, fields, properties and events; on a type, it resets all its static members.
-  - A field gets its initializer re-applied, or its C# `default` when it has none; `= new()` builds a fresh instance. A `static readonly` collection (`List<T>`, `Dictionary<TKey,TValue>`, `HashSet<T>`, or any type with a parameterless `Clear`) keeps its instance and gets `Clear()`; its initializer must be omitted, `new()`, or the exact declared type. A readonly field of any other type is not documented.
+  - A field gets its initializer re-applied, or its C# `default` when it has none; `= new()` builds a fresh instance. A `static readonly` collection (`List<T>`, `Dictionary<TKey,TValue>`, `HashSet<T>`, or any type with a parameterless `Clear`) keeps its instance and gets `Clear()`; its initializer must be omitted, `new()`, or the exact declared type. A readonly field of any other type is not documented; observed below, it breaks generation for the whole assembly.
   - The static constructor never re-runs; a type with `[AutoStaticsCleanup]` members and an explicit static constructor is UAL0014. Setup outside field initializers goes into an `[OnEnteringPlayMode]` method.
   - No performance statement anywhere.
-  - **Contradiction**: the Manual says it resets "on entering Play mode"; the API page says "on entering or exiting Play mode". **Unverified** which.
+  - **Contradiction**: the Manual says it resets "on entering Play mode"; the API page says "on entering or exiting Play mode". Observed below: both.
 
 ### Code lifecycle attributes (Unity 6.5 and later)
 
@@ -190,7 +192,7 @@ Sources: [6.6 code lifecycle](https://docs.unity3d.com/6000.6/Documentation/Manu
 
 #### Observed order, 6000.6.2f1
 
-Logged from a probe in `unity-sandbox/` (batch-mode Editor, one GameObject spawned in `BeforeSceneLoad`). Asset import worker processes also load project code and fire `[OnCodeLoaded]`, `[OnCodeInitializing]`, `[InitializeOnLoadMethod]` and friends, so a callback with side effects (files, sockets) runs in several processes.
+Logged from a probe in `unity-sandbox/` (batch-mode Editor, one GameObject spawned in `BeforeSceneLoad`). Asset import worker processes also load project code and fire `[OnCodeLoaded]`, `[OnCodeInitializing]`, `[InitializeOnLoadMethod]` and friends, so a callback with side effects (files, sockets) runs in several processes. Observed again for #33: after a texture import, each worker log (`Logs/AssetImportWorker*.log`) held the `[InitializeOnLoad]` static constructor, `[InitializeOnLoadMethod]`, `[OnCodeLoaded]` and `[OnCodeInitializing]`, each with `AssetDatabase.IsAssetImportWorkerProcess()` true. That method "Determines whether the current process is an Asset Import Worker process", and Unity advises it "only when you need to conditionally skip global state modifications that cannot be immediately refactored" ([IsAssetImportWorkerProcess, 6000.6](https://docs.unity3d.com/6000.6/Documentation/ScriptReference/AssetDatabase.IsAssetImportWorkerProcess.html)).
 
 Entering Play mode, **domain reload on**:
 
@@ -205,13 +207,27 @@ Entering Play mode, **domain reload off**: steps 2 and 3 vanish except `[Initial
 - So `[OnEnteringPlayMode]`, `[OnExitingPlayMode]`, `[InitializeOnEnterPlayMode]`, every `RuntimeInitializeOnLoadMethod` load type, and the Edit mode pair fire on every Play session with domain reload on or off. The four `OnCode*` attributes, `[InitializeOnLoad]`, `[InitializeOnLoadMethod]` and `AssemblyReloadEvents` fire only when code actually reloads.
 - Exiting Play mode (either setting): `playModeStateChanged(ExitingPlayMode)`, `[OnExitingPlayMode]`, `[OnEnteringEditMode]`, `playModeStateChanged(EnteredEditMode)`. No code reload happened on exit.
 - Script recompile in Edit mode: `beforeAssemblyReload`, `[OnExitingEditMode]`, `[OnCodeDeinitializing]`, `[OnCodeUnloading]`, (reload) `[InitializeOnLoad]`, `[OnCodeLoaded]`, `[OnCodeInitializing]`, `[InitializeOnLoadMethod]`, `afterAssemblyReload`, `[OnEnteringEditMode]`.
-- **Unverified**: the same orders on 6.5 (docs match, not run), code reload during Play mode, and Player builds (docs say `[OnEnteringPlayMode]` runs at Player startup and `[OnExitingPlayMode]` before quit).
+- On 6000.5.11f1 (#33, reload off), entering and exiting Play mode gave the same order as 6.6 for every callback probed (`[OnExitingEditMode]`, `playModeStateChanged`, `[InitializeOnEnterPlayMode]`, `[OnEnteringPlayMode]`, `SubsystemRegistration`, `[OnExitingPlayMode]`, `[OnEnteringEditMode]`).
+- **Unverified**: the reload-on order on 6.5, code reload during Play mode, and Player builds (docs say `[OnEnteringPlayMode]` runs at Player startup and `[OnExitingPlayMode]` before quit).
+
+#### `[AutoStaticsCleanup]` observed, 6000.6.2f1 and 6000.5.11f1
+
+The six code lifecycle checks from [#22](https://github.com/Hissal/mattpocock-skills-unity/issues/22), run for #33 (2026-09-24) through a resident headless editor (`editor_play`, `eval`, `editor_stop`) with Enter Play Mode options `DisableDomainReload | DisableSceneReload`. Probes: a runtime asmdef assembly and `Assembly-CSharp`, no `.globalconfig` anywhere, the analyzer off. Each static was dirtied in Edit mode, then again in Play mode, and read from a trace written by every callback. Check 1 ran on both versions (a throwaway 6.5 project), the rest on 6.6; checks 2 and 3 also gave the same result on 6.5.
+
+1. **When it resets: both entering and exiting Play mode**, every session. Entering: `[OnExitingEditMode]`, `playModeStateChanged(ExitingEditMode)` and `[InitializeOnEnterPlayMode]` still saw the dirty values; `[OnEnteringPlayMode]`, `SubsystemRegistration` and everything after saw them reset. Exiting: `playModeStateChanged(ExitingPlayMode)` and `[OnExitingPlayMode]` saw the dirty values; `[OnEnteringEditMode]` saw them reset. Reflection shows how: the generator adds a method named `__AutoStaticsCleanup_UnityEngine_PlayModeScope_Both` next to the `..._RegisterLifecycleMethod` methods it generates for the lifecycle attributes, so the reset is itself a lifecycle callback, and its order against a user `[OnEnteringPlayMode]` on the same transition is not documented (one observation: the user callback ran after it). The attribute has only a parameterless constructor (`AllowMultiple = true`), so there is no enter-only form.
+2. **`static readonly` field of a type without `Clear()`: compiles, and breaks the whole assembly's cleanup.** The generator throws `RoslynSymbolException: Type T33.Payload has no clear method ... cannot be automatically cleaned up` and the compile shows only `warning CS8785: Generator 'AutoStaticsCleanupCodeGenerator' failed to generate source. It will not contribute to the output`. At runtime no `[AutoStaticsCleanup]` member in that assembly reset any more (the type-level probe included), while the `Assembly-CSharp` probe still did. `unity recompile --json` reported `compilationFailed: false` and an empty `warnings` array: the warning appears only in the Editor log.
+3. **Non-`partial` type with a field-level `[AutoStaticsCleanup]`, analyzer off: compile error** `CS0260: Missing partial modifier on declaration of type 'NonPartialProbe'; another partial declaration of this type exists` (the generator emits its own `partial` declaration).
+4. **No `.globalconfig` needed**: resets worked in the asmdef assembly and in `Assembly-CSharp`.
+5. **Event and property**: a static event with one subscriber came back `null`; an auto-property with no initializer came back `null`, one with an initializer came back to it. Also: an `int` with no initializer came back `0`; a field initialized with `new Payload()` got a new instance; a `static readonly List<int>` kept its instance and was emptied.
+6. **Type-level `[AutoStaticsCleanup]` with a field-level `[NoAutoStaticsCleanup]`**: the opt-out wins; that field kept its dirty value across two Play sessions while the type's other statics reset.
+
+Also observed: a MonoBehaviour singleton's static instance field after exiting Play mode (reload off) held the destroyed object: `Instance == null` was true, `ReferenceEquals(Instance, null)` and `Instance is null` were false, and `Instance ?? fallback` returned the destroyed object. `UNITY_6000_5_OR_NEWER` is defined on 6000.5.11f1 (seen in the compiler response file), so a dual path can gate on it.
 
 ### Pre-6.5 fallbacks and Enter Play Mode Options history
 
 - `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` (`UnityEngine`): the 6.0 manual's way to reset runtime statics; runs "before the first scene is loaded", and the Editor ensures the same invocations on entering Play mode. Observed above to fire on every Play entry with domain reload off. [6.0 domain reload](https://docs.unity3d.com/6000.0/Documentation/Manual/domain-reloading.html), [6.6 RuntimeInitializeOnLoadMethod](https://docs.unity3d.com/6000.6/Documentation/ScriptReference/RuntimeInitializeOnLoadMethodAttribute.html)
 - `[InitializeOnEnterPlayMode]` (`UnityEditor`): static method, optionally taking `EnterPlayModeOptions`; "Use to reset static fields in Editor classes on Enter Play Mode without Domain Reload." Unchanged in 6.6 with no replacement note; the manual maps `[OnEnteringPlayMode]` to its timing, except `[OnEnteringPlayMode]` runs after `OnDisable` on Editor objects and `[InitializeOnEnterPlayMode]` before. [6.0 API](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/InitializeOnEnterPlayModeAttribute.html), [6.6 code lifecycle](https://docs.unity3d.com/6000.6/Documentation/Manual/programming-code-lifecycle.html)
-- `[InitializeOnLoad]` (`UnityEditor`, static constructor) and `[InitializeOnLoadMethod]`: run on every domain reload, before asset import completes, so asset loading there can return null. [6.6 InitializeOnLoad](https://docs.unity3d.com/6000.6/Documentation/ScriptReference/InitializeOnLoadAttribute.html)
+- `[InitializeOnLoad]` (`UnityEditor`, static constructor) and `[InitializeOnLoadMethod]`: run on every domain reload, before asset import completes, so asset loading there can return null. The page says to avoid asset loading there and to use `AssetPostprocessor.OnPostprocessAllAssets` for asset work after a domain reload. [6.6 InitializeOnLoad](https://docs.unity3d.com/6000.6/Documentation/ScriptReference/InitializeOnLoadAttribute.html)
 - Enter Play Mode Options first shipped in **2019.3** (with `[InitializeOnEnterPlayMode]`), marked "experimental" through 2020.1; the label is gone from 2020.2. The 2019.2 docs 404 on both pages. [2019.3 manual](https://docs.unity3d.com/2019.3/Documentation/Manual/ConfigurableEnterPlayMode.html), [2020.2 manual](https://docs.unity3d.com/2020.2/Documentation/Manual/ConfigurableEnterPlayMode.html)
 
 ## 9. What triggers recompilation
