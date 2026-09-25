@@ -205,6 +205,14 @@ The five checks the design ([#9](https://github.com/Hissal/mattpocock-skills-uni
 
 End to end with the shipped script (a fresh component `Q`, field `before` renamed to `after` with the attribute): `Find` listed four files (prefab, variant, nested prefab, scene); `Reserialize` with that list changed exactly those four files and re-recorded one scene instance; every override then carried `propertyPath: after`; after removing the attribute every value survived (prefab 1, variant 3, nested 5, scene instance 7, plain scene object 4).
 
+Extra checks (same day and setup, a second session), run so the skill could state these as fact:
+
+- **`MovedFrom`**: two `[SerializeReference]` classes moved from namespace `T31.OldNs` to `T31.NewNs`. The one carrying `[MovedFrom(false, sourceNamespace: "T31.OldNs")]` loaded as the new type with its value; the one without loaded as **null**.
+- **Missing managed-reference types**: `SerializationUtility.HasManagedReferencesWithMissingTypes` returned **false** on that host, and `GetManagedReferencesWithMissingTypes` returned an empty array, after load, after instantiating the prefab and after a forced reimport, even though the reference loaded as null. The file still held the old entry (`type: {class: Ref2, ns: T31.OldNs, asm: Assembly-CSharp}` with its data). `ForceReserializeAssets` on the host then **dropped** that data: the field became `rid: -2` with an empty `type: {class: , ns: , asm: }` entry. The `MovedFrom` reference was rewritten to `ns: T31.NewNs`. So re-saving a host loses a missing type's data, and the documented detection API cannot be trusted alone on 6000.6.2f1: grep the `references` `type:` lines instead.
+- **Enums**: a field set to `Blue` in `enum { Red, Green, Blue }` was stored as `c: 2`; after reordering to `{ Blue, Red, Green }` it read `Green`.
+- **Dictionaries on 6.6**: a public `Dictionary<string, int>` without `[SerializeField]` was not written at all; one with `[SerializeField]` was written as a `- key: / value:` list.
+- **`FormerlySerializedAs` inside a nested `[Serializable]` class**: renaming `Inner.oldInner` to `newInner` with the attribute kept the value (3) on a prefab.
+
 Found alongside:
 
 - `run_script --args` takes a JSON array of positional arguments (`'["T31.B"]'`); a bare string is rejected ("expects JArray"), and a `string[]` parameter takes a nested array.

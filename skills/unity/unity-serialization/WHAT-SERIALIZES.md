@@ -25,7 +25,7 @@ A `[Serializable]` class in a plain field is stored **inline**, by value, as the
 
 - The stored object must be a `[Serializable]` class: not a `UnityEngine.Object`, not a value type, not a dictionary.
 - Sharing only works within one host object: two ScriptableObjects never share a managed reference.
-- A missing type loads as null while Unity keeps the stored data; `SerializationUtility.HasManagedReferencesWithMissingTypes` and `GetManagedReferencesWithMissingTypes` find them.
+- A missing type loads as null. The file keeps the stored data only until the host is re-saved, which writes the reference as null and drops the data. `SerializationUtility.HasManagedReferencesWithMissingTypes` is documented to find them but returned false on 6000.6.2f1; the `type:` lines of the file's `references:` block are the reliable check.
 - It costs more storage and load time than inline: use it only for what inline cannot do.
 
 ## Dictionaries (6.6 and later)

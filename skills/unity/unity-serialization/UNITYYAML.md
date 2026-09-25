@@ -32,20 +32,20 @@ MonoBehaviour:
 - `{fileID: <id>}` without a GUID points inside the same file. `{fileID: 0}` is null.
 - `type: 2` loads directly from `Assets/` (materials, `.asset` files); `type: 3` loads through the import pipeline (prefabs, textures, models, scripts).
 - Well-known fileIDs: `11500000` is a `.cs` script (in `m_Script`); `100100000` is a prefab's asset handle (in `m_SourcePrefab`). A script inside a DLL has the DLL's GUID and its own fileID.
-- References across scenes cannot be stored, and a prefab or ScriptableObject cannot reference a scene object.
+- The Editor blocks references across scenes by default (`EditorSceneManager.preventCrossSceneReferences`). The format implies a prefab or ScriptableObject cannot hold a reference to a scene object either, though no single doc sentence says so.
 
 ## `.meta` files
 
-A `.meta` holds `guid:` (the asset's identity) and its importer settings. Import settings can be edited by hand (prefer the `AssetImporter` APIs); the `guid:` line changes only when adopting a known GUID is the point. A new file needs no `.meta`: Unity generates one on import. Binary assets (textures, audio, models) cannot be merged, but their `.meta` is text. Check `.gitattributes` for `filter=lfs` before trusting a binary file's bytes: without Git LFS installed, Git checks out pointer files silently, and Unity imports the pointers.
+A `.meta` holds `guid:` (the asset's identity) and its importer settings. Change import settings through the `AssetImporter` APIs; hand edits to them are not documented as supported. The `guid:` line changes only when adopting a known GUID is the point. A new file needs no `.meta`: Unity generates one on import. Binary assets (textures, audio, models) cannot be merged, but their `.meta` is text. Check `.gitattributes` for `filter=lfs` before trusting a binary file's bytes: without Git LFS installed, Git checks out pointer files silently, and Unity imports the pointers.
 
 ## Surgical edit recipes
 
 Each ends with the validation checklist in `SKILL.md`.
 
-- **GUID swap**, repairing references to an asset replaced by one with a new GUID: list the files first, then replace in place, leaving `.meta` files out.
+- **GUID swap**, repairing references to an asset replaced by one with a new GUID: list the files first, then replace in place. Other `.meta` files can hold references too (a script's default references, a model's remapped materials), so they stay in the search; only a `.meta` whose own `guid:` line is the old GUID stays out.
   ```bash
-  grep -rlF --exclude='*.meta' 'guid: <old>' Assets Packages
-  grep -rlF --exclude='*.meta' 'guid: <old>' Assets Packages | xargs sed -i 's/guid: <old>/guid: <new>/g'
+  grep -rlF 'guid: <old>' Assets Packages | grep -vxF '<old asset path>.meta'
+  grep -rlF 'guid: <old>' Assets Packages | grep -vxF '<old asset path>.meta' | xargs sed -i 's/guid: <old>/guid: <new>/g'
   ```
   Also check the fileID: a script moved into a DLL, or a sub-asset, changes it too.
 - **`m_Script` repair**: the same swap on the `m_Script:` lines, with the script's `.meta` GUID and `fileID: 11500000`.

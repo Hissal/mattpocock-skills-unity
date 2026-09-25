@@ -15,7 +15,7 @@ A rule gated on a Unity version says so. When the gate matters, read the version
 
 - **The `.meta` GUID is the asset**, not its path. A reference to another file is stored as `{fileID, guid, type}`, so a moved or renamed asset keeps every reference as long as its `.meta` travels with it. Move, rename and delete an asset together with its `.meta` (a folder with its folder `.meta`), and commit `.meta` files. A lost or regenerated `.meta` means a new GUID, and every reference to the asset breaks silently.
 - **Scripts are assets.** A component stores `m_Script: {fileID: 11500000, guid: <the script's .meta GUID>, type: 3}`, never the class name. Renaming a MonoBehaviour or ScriptableObject class is safe when its file is renamed to match and keeps its `.meta`; deleting and recreating the file leaves a missing script everywhere it was used.
-- **One class per script file, named after the file, in a block namespace.** Unity cannot map a class in a file-scoped namespace (`namespace X;`) to its script: `MonoScript.GetClass()` returns null, and the component saves as `m_Script: {fileID: 0}`, a missing script on the next load.
+- **One class per script file, named after the file, in a block namespace.** Unity cannot map a class in a file-scoped namespace (`namespace X;`) to its script: `MonoScript.GetClass()` returns null, and the component saves as `m_Script: {fileID: 0}`, a missing script on the next load (observed on 6000.6.2f1).
 - **ScriptableObject and `AssetReference` fields are GUID references**: they survive moves and renames like any reference. An Addressables address, and any path string passed to a load call, is a **string contract**: renaming or moving the asset breaks it silently, so grep the code for the string.
 - `Library/` is a per-machine cache Unity regenerates from `Assets/`, `Packages/` and `ProjectSettings/`: leave it out of edits and commits.
 
@@ -27,7 +27,7 @@ Serialized data is keyed by name. Every rename below carries its attribute in th
 
 - **A serialized field**, including one inside a `[Serializable]` class: `[FormerlySerializedAs("oldName")]` on the renamed field. Unity reads the old name everywhere on load, prefab overrides included, but files keep it on disk until reserialized: see the follow-up below.
 - **A field turned into an auto-property** with `[field: SerializeField]` serializes as its backing field, `<Name>k__BackingField`: add `[field: FormerlySerializedAs("oldName")]`. Back from an auto-property to a field: `[FormerlySerializedAs("<Name>k__BackingField")]`.
-- **A `[SerializeReference]` type** renamed, or moved to another namespace or assembly: `[MovedFrom(false, sourceNamespace: ..., sourceAssembly: ..., sourceClassName: ...)]` on the type, naming only what changed. The stored data records each object's class, namespace and assembly; without the attribute the reference loads as null (a managed reference with a missing type). Fix the type before any host is re-saved, since Unity documents the preserved data but not how long it survives.
+- **A `[SerializeReference]` type** renamed, or moved to another namespace or assembly: `[MovedFrom(false, sourceNamespace: ..., sourceAssembly: ..., sourceClassName: ...)]` on the type, naming only what changed. The stored data records each object's class, namespace and assembly; without the attribute the reference loads as null, and re-saving the host drops its data for good. Fix the type before any host is re-saved.
 - **A serialized enum** stores its integer value: give it explicit values, append new members, and never reorder, remove or reuse a value.
 - **A serialized field's type** changing is not a rename: treat it as data loss unless you check the conversion in the Editor.
 
@@ -51,7 +51,7 @@ Then remove the attribute, compile, validate, and commit. Prefab files keep a st
 
 With an Editor, run [scripts/SerializationScope.cs](scripts/SerializationScope.cs) (to run C# in the Editor, call the Skill tool with "unity-verification"; its header names each entry point and its arguments). `Find` walks every MonoBehaviour and ScriptableObject type that serializes the changed type at any depth (nested `[Serializable]` types, inherited fields, arrays and lists, `[SerializeReference]` fields that can hold it), maps them to script GUIDs, and greps every UnityYAML file to a fixpoint (each matched prefab adds its own GUID, which pulls in nested instances, variants and scenes). The list over-reaches by type: every file using a host component is listed, whether or not that instance holds the changed type. Over-reaching only adds files to the rewrite; missing one loses data.
 
-Without an Editor, run [scripts/scope.sh](scripts/scope.sh) `<project> <script.cs>...`, seeded with every script whose class declares the changed field or holds the changed type. It covers only the grep phase, so the proposal states that hosts reached only through nested or `[SerializeReference]` types may be missing.
+Without an Editor, run [scripts/scope.sh](scripts/scope.sh) `<project> <script.cs>...`, seeded with every script whose class declares the changed field or holds the changed type, and every subclass of those. It covers only the grep phase, so the proposal states that hosts reached through subclasses, nested types or `[SerializeReference]` fields may be missing.
 
 ## Editing order
 
@@ -67,7 +67,7 @@ This skill names what to check; for how Unity runs it and how to report the resu
 
 - **No missing scripts**: no new `m_Script: {fileID: 0}` in the changed files; in the Editor, `GameObjectUtility.GetMonoBehavioursWithMissingScriptCount` on each affected object is 0.
 - **No missing references**: every `guid:` added in the diff resolves to a `.meta` in the repo or a package.
-- **No managed references with missing types**: `SerializationUtility.HasManagedReferencesWithMissingTypes` is false on each host.
+- **No managed references with missing types**: every `type: {class: ..., ns: ..., asm: ...}` line in the changed files' `references:` blocks names a type that exists. `SerializationUtility.HasManagedReferencesWithMissingTypes` is documented for this, but returned false on 6000.6.2f1 while a reference loaded as null, so treat a false as unconfirmed.
 - **No lost values**: a renamed field's value read back through `SerializedObject` on a sample prefab, variant and scene instance matches the value before the change.
 - **Every move kept its `.meta`**: `git status` or `git diff -M --name-status` pairs each moved or renamed asset with its `.meta`, and no `.meta` was deleted and re-added under a new GUID.
 - **No old GUID left** after a GUID swap: a grep for it finds nothing.

@@ -6,9 +6,10 @@
 #
 # Usage: scope.sh <project> <seed>...
 #   <seed> is a script path (its .meta supplies the GUID) or a bare 32-hex GUID.
-# Seed with every script whose type serializes the changed type. Without the
-# Editor's type closure, hosts reached only through nested or [SerializeReference]
-# types are missing unless their scripts are seeded too: say so in the proposal.
+# Seed with every script whose type serializes the changed type, and their
+# subclasses. Without the Editor's type closure, hosts reached through subclasses,
+# nested types or [SerializeReference] fields are missing unless their scripts are
+# seeded too: say so in the proposal.
 
 set -euo pipefail
 
