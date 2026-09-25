@@ -4,6 +4,8 @@
 
 Throwaway is a constraint on how the code is *written*, not a promise to destroy it. No tests, no error handling beyond what makes it run, no abstractions, no persistence, because none of that helps you learn the one thing you're trying to learn. What survives is the answer, folded into the real code, and the prototype itself, parked on a branch out of main as the evidence the answer came from.
 
+In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router where the prototype lives and how it runs and is removed, and builds it in the engine by default, isolated in its own folder and editor-only assembly and started from one `Prototypes/<name>` menu item, offering an HTML page only where one will do.
+
 ## When to reach for it
 
 Type `/prototype`, or the [agent](https://www.aihero.dev/ai-coding-dictionary/agent) reaches for it automatically when a task fits.
