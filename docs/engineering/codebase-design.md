@@ -4,6 +4,8 @@
 
 It is a reference, not a process. There is no loop to run, no artifact it produces, no checkpoint where it asks you a question. Every other skill that touches design borrows its vocabulary; on its own it gives you the language and stops. That is the thing to know before you invoke it, because a skill with no process and no stopping rule will improvise one if you point a [session](https://www.aihero.dev/ai-coding-dictionary/session) at it and say "go." See the questions below for what that looks like in practice.
 
+In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router where the engine sits as a dependency and how to test across it, and how seams line up with assembly boundaries.
+
 ## When to reach for it
 
 Type `/codebase-design`, or the agent reaches for it automatically when a design task fits.
