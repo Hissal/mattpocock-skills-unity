@@ -15,12 +15,12 @@ The usual ten ways to build a feedback loop, in their Unity form. Same order, sa
 
 | Loop kind | Unity form |
 |---|---|
-| 1 Failing test | EditMode `[Test]` first; PlayMode only when the bug needs frames or scenes (`unity-testing` picks the seam) |
+| 1 Failing test | EditMode `[Test]` first; PlayMode only when the bug needs frames or scenes (call `unity-testing` through the Skill tool to pick the seam) |
 | 2 to 4 HTTP script, CLI call, headless browser | The Play loop below, through a connected editor: `editor_play`, `wait_for` on the symptom, `console`, `eval` |
 | 5 Replay a captured trace | A captured save, input or data file replayed through `run_script` |
 | 6 Throwaway harness | `run_script` (no import, no domain reload), else `-executeMethod` |
 | 7 Fuzz | A loop inside one EditMode test |
-| 8 Bisection | `unity test` per commit. Warn first: each checkout imports its own `Library/` (cold, never shared), so every step can take minutes |
+| 8 Bisection | `unity test` per commit. Warn first: every step reimports what changed and recompiles, so each can take minutes, and a fresh checkout or worktree starts from a cold `Library/` |
 | 9 Differential | Editor vs Development player, domain reload on vs off, Mono vs IL2CPP |
 | 10 Human in the loop | Only for input, feel, visuals or a device (below) |
 
@@ -32,10 +32,10 @@ The usual ten ways to build a feedback loop, in their Unity form. Same order, sa
 
 ## The Play loop
 
-One command that goes red on the bug: copy [scripts/play-loop.sh](scripts/play-loop.sh) to the scratch dir and set its four variables (`PROJECT`, `DONE`, `SYMPTOM`, the budgets). It enters Play, waits until `DONE` holds (a static C# bool the scenario sets once it has run, added by a tagged probe when the code has none), reads the console since a cursor taken before Play, greps it for `SYMPTOM`, and stops Play.
+One command that goes red on the bug: copy [scripts/play-loop.sh](scripts/play-loop.sh) to the scratch dir and set its four variables (`PROJECT`, `DONE`, `SYMPTOM`, the budgets). It enters Play, waits until `DONE` holds (a static C# bool the scenario sets once it has run, added by a tagged probe when the code has none), reads the console since a cursor taken before Play, greps it for `SYMPTOM`, and stops Play. It waits on the scenario finishing rather than on the symptom, so a run that never gets there reads as no verdict, never green.
 
-- **Exit codes**: 1 red, 0 green, 2 no verdict (the scenario never finished: a timeout is never green), 3 the two runs disagree.
-- **Domain reload off**: the script reloads the domain first (`EditorUtility.RequestScriptReload()`) so run 1 is a true first Play, then runs twice. Exit 3 is the second-Play class, not flakiness: call `unity-code-lifecycle`. Without the reload, a one-shot static set by an earlier Play hides the bug on both runs.
+- **Exit codes**: 1 red, 0 green, 2 no verdict (the scenario never finished, or the console could not be read), 3 the two runs disagree.
+- **Domain reload off**: the script reloads the domain first (`EditorUtility.RequestScriptReload()`) so run 1 is a true first Play, then runs twice. Exit 3 is the second-Play class, not flakiness: call `unity-code-lifecycle` through the Skill tool. Without the reload, a one-shot static set by an earlier Play hides the bug on both runs.
 - **The symptom** is what the user saw: a tagged log line, an exception message, a wrong value logged at the moment it goes wrong. A symptom that is a state rather than a log line becomes a probe that logs the state when `DONE` flips.
 
 Traps the script already handles, and when to reach past it:
@@ -50,13 +50,13 @@ Traps the script already handles, and when to reach past it:
 
 - **The REPL** is `eval` and `run_script` against live Play state. A harness file lives outside the Unity project (the scratch dir or OS temp): `run_script` takes its absolute path, reaches the project's types, and leaves no import and no `.meta`.
 - **Stepping**: `editor_pause`, then `eval` calling `EditorApplication.Step()` once per frame.
-- **Conditional breakpoint**: `wait_for` with `on_met {"pause": true}` and `poll_interval_ms 0` pauses in the frame the condition first holds; inspect with `eval`, then step or stop.
+- **Conditional breakpoint**: `wait_for` with `async=true`, `on_met {"pause": true}` and `poll_interval_ms 0` pauses in the frame the condition first holds; poll `wait_status` until `met`, inspect with `eval`, then step or stop.
 - **An IDE debugger is a human step**, asked for only when the REPL cannot reach the state: a device, an IL2CPP player, a native crash path. Give the exact attach steps from [DEBUGGER.md](DEBUGGER.md).
 - **Guardrails**: pass `-wait-for-managed-debugger`, or build with Wait For Managed Debugger, only when a human is about to attach, since the process waits before running any script. Leave the user's editor in its current code optimization mode; switching to Debug (it slows Play) is the user's call.
 
 ## Bug classes
 
-Match the symptom to a class, then call the named skill for its rules. Exact messages and how to detect each are in [SYMPTOMS.md](SYMPTOMS.md).
+Match the symptom to a class, then call each skill its row names through the Skill tool for its rules, one call per skill. Exact messages and how to detect each are in [SYMPTOMS.md](SYMPTOMS.md).
 
 | Class | Signature | Calls |
 |---|---|---|
@@ -74,7 +74,7 @@ Match the symptom to a class, then call the named skill for its rules. Exact mes
 - **Harness scripts** (`run_script`, `eval_file`) live outside the Unity project: nothing to import, commit or clean up in the project.
 - **Repro assets** (a scene, a component that must be an asset) go in `<prototype folder>/Debug-<tag>/`, where `<tag>` is the tag on the debug log lines. The prototype folder keeps them out of `main` and player builds.
 - **Find every leftover** with both a path search and a content grep: `find <project>/Assets -path '*Debug-<tag>*'` (the folder, its scene, every `.meta`) and `grep -rn 'DEBUG-<tag>'` over the code and logs (tagged lines outside the folder). A content grep alone misses the scene and the `.meta` files.
-- **Remove** the folder with `unity-prototyping`'s removal procedure: GUID grep, delete with every `.meta`, compile check.
+- **Remove** the folder by `unity-prototyping`'s removal procedure (call it through the Skill tool): GUID grep, delete with every `.meta`, compile check.
 
 ## Humans in the loop
 

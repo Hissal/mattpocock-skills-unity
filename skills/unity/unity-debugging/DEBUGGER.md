@@ -4,7 +4,7 @@ An IDE debugger is a human step: no IDE documents a way for an agent to start a 
 
 ## What the agent prepares
 
-- **Throwaway code a breakpoint should bind in**: run it with `run_script --pdb true`, which emits a portable PDB so breakpoints bind and stacks map to file and line.
+- **Throwaway code a breakpoint should bind in**: run it with `run_script --pdb true`, which per Pipeline's docs emits a portable PDB so breakpoints bind in it (breakpoint binding has not been tried here).
 - **A player to debug**: a Development Build with Script Debugging, through `unity-verification`'s player build rung. The player log then carries `Starting managed debugger on port <n>` and a `Multi-casting "[IP] ... [Port] ... [Debug] 1 ..."` line: read the IP and port from it for the human.
 - **The Editor's code optimization** must be Debug to attach. Ask the user to switch it (the bug icon in the status bar, or Preferences > General > Code Optimization On Startup); it slows Play mode, so leave the choice and the switch back to them.
 - **`-wait-for-managed-debugger`** (or Wait For Managed Debugger in the build) only once the human is ready to attach: the process waits before running any script.
