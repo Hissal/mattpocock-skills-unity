@@ -4,7 +4,7 @@
 
 It never reopens the plan. There is no interview, no clarifying round, no proposal of a different approach. Whatever was settled upstream is the input, and the skill's whole job is to turn that into a commit. That is what separates it from typing "build this" at a fresh [agent](https://www.aihero.dev/ai-coding-dictionary/agent), which will happily redesign the work while it builds it.
 
-In a Unity repo it also pulls in the Unity run cadence and checks through the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router, and when Unity cannot run here it still commits, ending with a report of which checks ran and which stayed unvalidated.
+In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router how often to run Unity tests and checks and how to verify the change, and when Unity cannot run it still commits, ending with a report of which checks ran and which stayed unvalidated.
 
 ## When to reach for it
 
