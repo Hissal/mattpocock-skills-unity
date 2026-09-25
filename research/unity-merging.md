@@ -175,7 +175,32 @@ Conflict shapes and rules:
 
 ## 7. Gaps and open questions
 
-- Unity does not document the Git merge-driver form, the exit codes (0 clean, 1 error or unsupported, 2 conflicts) or what the dest file contains on conflict; all of that is observed behaviour of 6000.3.20f1 [tool].
-- Whether `--force` is semantically safe for every YAML asset type (for example `AnimatorController` state machines) is untested [unverified].
-- Exact trigger and winner of the GUID reassignment on collision [unverified].
+- Unity does not document the Git merge-driver form, the exit codes (0 clean, 1 error or unsupported, 2 conflicts) or what the dest file contains on conflict; all of that is observed behaviour of 6000.3.20f1 and 6000.6.2f1 [tool] (section 8).
+- Whether `--force` is semantically safe for every YAML asset type is untested beyond a property-level merge of an `AnimatorController` and an `AnimationClip`, which loaded cleanly (section 8) [tool].
+- The GUID reassignment on collision was observed on 6000.6.2f1 (section 8), but is undocumented and may change [tool].
 - No primary source found for a Unity-provided "validate project after merge" command; the validator in section 3 has to be written by the project.
+
+## 8. Sandbox checks (6000.6.2f1)
+
+The four checks the `MERGING.md` claims rest on, run for [#40](https://github.com/Hissal/mattpocock-skills-unity/issues/40) on 2026-09-25 with Unity 6000.6.2f1 (its bundled `UnityYAMLMerge.exe`), Git for Windows 2.55.0, in `unity-sandbox/` and a scratch Git repo. All [tool].
+
+1. **The manual stage rerun works.** A copy of the URP blank `SampleScene.unity`, both sides renaming the same GameObject, merged by Git with no driver (markers present). `git show :1:/:2:/:3:` into base, ours, theirs, then `merge -h --force --fallback none -o report.txt --describe base theirs ours out`: exit 2, no markers in `out`, the conflicted `m_Name` left at the base value, and the report lists `Left <fileID>.GameObject.m_Name change to <theirs>` / `Right ... change to <ours>`. With `-p`: exit 2, `out` holds theirs. Different properties changed on each side: exit 0, both merged. A `.controller` without `--force`: exit 1, `Don't know how to merge controller files`, dest untouched. Same results as 6000.3.20f1 (section 2).
+   - With a local driver (`merge -h -p --force --fallback none %O %B %A %A`) and `merge=unityyamlmerge` on `*.unity`: Git reports `CONFLICT (content)` and `UU`, the file has no markers and holds theirs for the conflicted property.
+   - During `git rebase` of the same branches, stage 2 holds the upstream (the rename the rebase is onto), and the working file holds the replayed commit's value: the sides swap.
+   - **Driver defined, exe missing** (the global driver pointed at an editor version no longer installed): Git marks every file carrying the attribute unmerged, including one whose sides changed different objects, and each holds our side untouched, with no markers. So "no markers" alone does not mean Smart Merge ran; check that the driver's exe exists.
+   - Every argument error opens a modal `UnityYAMLMerge Error` dialog, even with `-h`, when `-h` comes before `merge` or `merge` is missing (`need 'merge' command specified`, `Missing command (e.g. 'merge') before option -h`). The call blocks until a human closes it.
+2. **A `--force` merge of `.controller` and `.anim` loads.** An `AnimatorController` (states Idle and Run, a float parameter) and an `AnimationClip` made through the API. Ours: Idle speed 2, clip sample rate 60. Theirs: Run speed 3, parameter renamed, clip wrap mode Loop. Both merges exit 0; after a headless import the controller loads with Idle 2, Run 3 and the renamed parameter, and the clip with frame rate 60, wrap Loop, its bindings intact. No import error beyond the file-name warning from the copy. Both sides changing Idle's speed: exit 2, `AnimatorState.m_Speed` in the report, dest at base.
+3. **The import log strings.** Headless import of three broken files:
+   - leftover markers in an `.anim`: `The file 'Assets/.../Markers.anim' seems to have merge conflicts. Please open it in a text editor and fix the merge.`
+   - a `.controller` whose `m_State: {fileID: N}` points at a missing anchor: `Broken text PPtr in file(Assets/.../Dangling.controller). Local file identifier (999999) doesn't exist!`
+   - broken YAML in an `.anim`: `Unable to parse file Assets/.../Broken.anim: [Parser Failure at line 80: Expected closing '}']`
+4. **Which asset keeps its GUID on a collision.** An imported clip (`ZZZ_Old.anim`) plus a new one (`AAA_New.anim`, sorting first) with a copy of its `.meta`: the log says `GUID [...] for asset 'AAA_New.anim' conflicts with: 'ZZZ_Old.anim' (current owner)` then `Assigning a new guid.`, and `AAA_New.anim.meta` is rewritten on disk with a new GUID. The asset already in the `Library/` keeps the GUID, whatever the name order. Two new clips sharing a fresh GUID: each is reported against the other and **both** get new GUIDs, so neither keeps it.
+
+### Driver checks after fixing the global driver (2026-09-25)
+
+A global driver of `merge -p --force %O %A %B`, with the exe path unquoted and pointing at an uninstalled editor, was replaced by `'<6000.6.2f1 UnityYAMLMerge.exe>' merge -h -p --force --fallback none %O %B %A %A`. Checked in a scratch repo whose `.gitattributes` sends `*.unity` and `*.meta` to the driver (as a real project's does), Git 2.55.0, no repo-local override. All [tool].
+
+- **The old argument form loses data silently.** Run by hand with an installed exe on a scene where each side renamed a different object: with no dest argument the tool prints the merged file to stdout and exits 0, and leaves `%A` untouched. As a driver, Git reads exit 0 as a clean merge and keeps `%A`, our side: their change disappears with no conflict reported.
+- **The fixed driver on scenes**: different objects renamed on each side merge cleanly (`M`, both names); the same object renamed on both sides is `UU` with no markers, holding their value.
+- **The fixed driver on `.meta`**: UnityYAMLMerge cannot parse `.meta` files (`Error parsing file ...: File is not a valid text serialized YAML file. Make sure that Asset Serialization is set to 'Force text' in Editor Settings.`), exit 1, dest untouched, also on a real project's texture `.meta`. So every `.meta` both sides changed is `UU` (an add/add `AA`) with no markers, holding our side, even for changes on different lines. A `.gitattributes` that sends `*.meta` to the driver turns every concurrent `.meta` edit into a conflict; leaving `.meta` to Git's line merge avoids it.
+

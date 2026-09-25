@@ -1,6 +1,6 @@
 ---
 name: unity-serialization
-description: Unity serialization rules. Use when changing a serialized field, type or enum; moving, renaming or deleting an asset or script; editing or reviewing scene, prefab, `.asset` or `.meta` files; or touching prefab overrides.
+description: Unity serialization rules. Use when changing a serialized field, type or enum; moving, renaming or deleting an asset or script; editing, reviewing or merging scene, prefab, `.asset` or `.meta` files; or touching prefab overrides.
 ---
 
 # Unity serialization
@@ -60,6 +60,10 @@ Without an Editor, run [scripts/scope.sh](scripts/scope.sh) `<project> <script.c
 3. **A surgical text edit**: line-level find-and-replace on known files, written straight to the text. Typical cases: a project-wide GUID swap repairing references to a replaced asset, an `m_Script` repair, a single value. UnityYAML is not standard YAML, so always edit the text in place; a YAML library that parses and re-emits a file corrupts it.
 
 Structural text edits (adding or removing `--- !u!` documents, fileIDs, `m_Modifications` entries) prefer the Editor; without one they are allowed only when simple. A `.meta` file's own `guid:` line changes only when adopting a known GUID is the point of the change. Every surgical or structural edit is followed by validation. The format and edit recipes: [UNITYYAML.md](UNITYYAML.md). Overrides, nesting and variants: [PREFABS.md](PREFABS.md).
+
+## Merge conflicts
+
+Resolving a merge or rebase conflict in a Unity asset, or checking the merged result: read [MERGING.md](MERGING.md) before touching a conflicted file.
 
 ## Validation
 

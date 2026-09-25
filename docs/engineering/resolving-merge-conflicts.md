@@ -4,6 +4,8 @@
 
 It refuses to treat a conflict as a text problem. Before touching a hunk it traces each side back to its **[primary source](https://www.aihero.dev/ai-coding-dictionary/primary-source)** (the commit message, the PR, the original issue), so it is choosing between two intents rather than between two blocks of text, and it preserves both wherever they are compatible. Where they genuinely are not, it picks the side matching the merge's stated goal and names the trade-off. It invents no new behaviour to paper over a clash, and `--abort` is not an option it has: the merge is always carried to a finished commit.
 
+In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router how to resolve Unity assets, which it does by file type, and pauses for a human on the few conflict kinds it should not guess instead of aborting.
+
 ## When to reach for it
 
 Type `/resolving-merge-conflicts`, or the [agent](https://www.aihero.dev/ai-coding-dictionary/agent) reaches for it automatically when a task fits.
