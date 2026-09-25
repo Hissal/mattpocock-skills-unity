@@ -24,17 +24,20 @@ patterns=$(mktemp)
 matched=$(mktemp)
 trap 'rm -f "$patterns" "$matched"' EXIT
 
+# Prints the GUID from "$1.meta"; prints nothing when the .meta is missing or has none.
 guid_of() {
+  [ -f "$1.meta" ] || return 0
   sed -n 's/^guid: \([0-9a-f]\{32\}\).*/\1/p' "$1.meta"
 }
 
 for seed in "$@"; do
   if [[ $seed =~ ^[0-9a-f]{32}$ ]]; then
     guid=$seed
-  elif [ -f "$seed.meta" ]; then
-    guid=$(guid_of "$seed")
   else
-    echo "scope.sh: no .meta beside $seed" >&2
+    guid=$(guid_of "$seed" || true)
+  fi
+  if [ -z "$guid" ]; then
+    echo "scope.sh: no GUID in $seed.meta" >&2
     exit 1
   fi
   echo "guid: $guid" >> "$patterns"
@@ -52,7 +55,14 @@ while :; do
     echo "$file" >> "$matched"
     added=1
     case $file in
-      *.prefab) echo "guid: $(guid_of "$file")" >> "$patterns" ;;
+      *.prefab)
+        guid=$(guid_of "$file" || true)
+        if [ -n "$guid" ]; then
+          echo "guid: $guid" >> "$patterns"
+        else
+          echo "scope.sh: no GUID in $file.meta: files nesting it were not followed" >&2
+        fi
+        ;;
     esac
   done < <(grep -rlF --exclude='*.meta' -f "$patterns" "${dirs[@]}" || true)
   [ $added -eq 0 ] && break

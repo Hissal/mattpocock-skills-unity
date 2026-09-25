@@ -216,6 +216,7 @@ Extra checks (same day and setup, a second session), run so the skill could stat
 Found alongside:
 
 - `run_script --args` takes a JSON array of positional arguments (`'["T31.B"]'`); a bare string is rejected ("expects JArray"), and a `string[]` parameter takes a nested array.
+- `SerializationScope.Reserialize` refuses (throws before writing) while an open scene is dirty, and after its scene pass reopens the scenes that were open (checked with one clean scene open).
 - `eval` snippets reach project assemblies (`Assembly-CSharp`, `Assembly-CSharp-Editor`) directly.
 - Unity 6.6 writes `m_EditorClassIdentifier: <Assembly>::<Namespace.Class>` on MonoBehaviours; the script link is still `m_Script`.
 - A `[SerializeReference]` field is written as `rid: <id>` with a `references: version: 2, RefIds:` block whose entries carry `type: {class, ns, asm}`. A ScriptableObject `.asset` holds its main object at `--- !u!114 &11400000`.

@@ -3,15 +3,13 @@
 // says when to run each entry point. <types> is a comma-separated list of full
 // type names, namespace included.
 //
-// Connected editor: copy this file into a scratch folder in the project, outside
-// Assets/, and run_script it:
-//   --entry SerializationScope.Find        --args '["<types>"]'
-//   --entry SerializationScope.Reserialize --args '["<types>", "<approved path list>"]'
-// Headless: copy it into an Editor folder under Assets/ (remove it after, with its
-// .meta) and pass -executeMethod SerializationScope.FindFromCommandLine or
-// SerializationScope.ReserializeFromCommandLine, with
-//   -serializationScopeTypes <types> -serializationScopeOut <file>
-// and, to reserialize, -serializationScopePaths <file holding the approved list>.
+// Entry points (how to run C# in the Editor is unity-verification's):
+//   Find(types)                   connected editor, from a scratch copy outside Assets/
+//   Reserialize(types, pathList)  connected editor; pathList is the approved list, one path per line
+//   FindFromCommandLine,          headless, from a copy in an Editor folder under Assets/
+//   ReserializeFromCommandLine    (removed after, with its .meta), reading
+//                                   -serializationScopeTypes <types> -serializationScopeOut <file>
+//                                   and, to reserialize, -serializationScopePaths <file>
 //
 // Find returns one project-relative path per line, sorted; lines starting with "#" are notes.
 
@@ -49,16 +47,20 @@ public static class SerializationScope
 
     // Rewrites the approved files with ForceReserializeAssets. It leaves a scene's prefab
     // instance overrides on the old propertyPath, so each listed scene is then opened and
-    // those overrides re-recorded under the new name before it is saved.
+    // those overrides re-recorded under the new name before it is saved. It refuses while an
+    // open scene has unsaved changes, and reopens the user's scenes after.
     public static string Reserialize(string typeNames, string paths)
     {
         var hosts = Hosts(Targets(typeNames));
-        var list = paths.Split(new[] { '\n', '\r', ',' }, StringSplitOptions.RemoveEmptyEntries)
+        var list = paths.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(p => p.Trim()).Where(p => p.Length > 0 && !p.StartsWith("#")).ToArray();
+        var scenes = list.Where(p => p.EndsWith(".unity", StringComparison.OrdinalIgnoreCase)).ToArray();
+        var open = EditorSceneManager.GetSceneManagerSetup();
+        if (scenes.Length > 0 && Enumerable.Range(0, EditorSceneManager.sceneCount).Any(i => EditorSceneManager.GetSceneAt(i).isDirty))
+            throw new InvalidOperationException("an open scene has unsaved changes: ask the user to save or discard them first");
         AssetDatabase.ForceReserializeAssets(list);
 
         int recorded = 0;
-        var scenes = list.Where(p => p.EndsWith(".unity", StringComparison.OrdinalIgnoreCase)).ToArray();
         foreach (var path in scenes)
         {
             var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
@@ -72,7 +74,11 @@ public static class SerializationScope
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
         }
-        if (scenes.Length > 0) EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        if (scenes.Length > 0)
+        {
+            if (open.Length > 0 && open.All(s => !string.IsNullOrEmpty(s.path))) EditorSceneManager.RestoreSceneManagerSetup(open);
+            else EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        }
         return $"reserialized {list.Length} files; re-recorded {recorded} prefab instance components in {scenes.Length} scenes";
     }
 
@@ -124,8 +130,10 @@ public static class SerializationScope
                 if (matched.Contains(path) || !needles.Any(text.Contains)) continue;
                 matched.Add(path);
                 grew = true;
-                if (path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase))
-                    needles.Add("guid: " + AssetDatabase.AssetPathToGUID(path));
+                if (!path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase)) continue;
+                var prefabGuid = AssetDatabase.AssetPathToGUID(path);
+                if (prefabGuid.Length > 0) needles.Add("guid: " + prefabGuid);
+                else notes.Add($"# no GUID for {path}: files nesting it were not followed");
             }
         }
 
@@ -193,12 +201,12 @@ public static class SerializationScope
         {
             if (memo.TryGetValue(type, out var known)) return known;
             memo[type] = false; // cycle guard: a type is not assumed to contain itself
-            bool result = SerializedFields(type).Any(Field);
+            bool result = SerializedFields(type).Any(CarriesTarget);
             memo[type] = result;
             return result;
         }
 
-        bool Field(FieldInfo field)
+        bool CarriesTarget(FieldInfo field)
         {
             bool byReference = field.IsDefined(typeof(SerializeReference), true);
             foreach (var element in Elements(field.FieldType))
@@ -206,13 +214,13 @@ public static class SerializationScope
                 if (typeof(UnityEngine.Object).IsAssignableFrom(element)) continue; // a reference, not inline data
                 if (!byReference)
                 {
-                    if (Matches(element) || (Custom(element) && Contains(element))) return true;
+                    if (Matches(element) || (IsSerializableCustom(element) && Contains(element))) return true;
                     continue;
                 }
                 // [SerializeReference]: the stored object can be any serializable type assignable to the field.
                 if (targets.Any(t => !typeof(UnityEngine.Object).IsAssignableFrom(t) && element.IsAssignableFrom(t))) return true;
                 var candidates = TypeCache.GetTypesDerivedFrom(element).Append(element)
-                    .Where(c => !c.IsAbstract && !c.IsInterface && Custom(c));
+                    .Where(c => !c.IsAbstract && !c.IsInterface && IsSerializableCustom(c));
                 if (candidates.Any(c => Matches(c) || Contains(c))) return true;
             }
             return false;
@@ -220,7 +228,7 @@ public static class SerializationScope
 
         bool Matches(Type type) => targets.Any(t => t.IsAssignableFrom(type));
 
-        static bool Custom(Type type) =>
+        static bool IsSerializableCustom(Type type) =>
             !type.IsPrimitive && !type.IsEnum && type != typeof(string) && type.IsDefined(typeof(SerializableAttribute), false);
 
         static IEnumerable<Type> Elements(Type type)
