@@ -1,6 +1,6 @@
 # Prototype templates
 
-Starting points for a prototype's menu item, logic driver and variant switcher, in the prototype's own assembly (`defineConstraints: ["UNITY_EDITOR"]`, so `UnityEditor` needs no `#if`). Replace `<Name>`, the paths and the namespace. Without an asmdef, wrap each file whole in `#if UNITY_EDITOR`.
+Starting points for a prototype's menu item, logic driver and variant switcher, in the prototype's own assembly (`defineConstraints: ["UNITY_EDITOR"]`, so `UnityEditor` needs no `#if`). Replace every `<...>` placeholder: `<Name>` (the prototype), `<Host>` (the host scene), `<Model>`, `<Field>` and `<Action>` (the pure class and its members). Without an asmdef, wrap each file whole in `#if UNITY_EDITOR`.
 
 ## Menu item
 
@@ -14,7 +14,7 @@ namespace Prototypes.<Name>
     static class PrototypeMenu
     {
         const string PrototypeScene = "Assets/_Prototypes/<Name>/<Name>.unity";
-        const string HostScene = "Assets/Scenes/<Host>.unity"; // omit for a standalone greybox scene
+        const string HostScene = "Assets/Scenes/<Host>.unity"; // a standalone greybox scene drops this line and the additive OpenScene
 
         [MenuItem("Prototypes/<Name>")]
         static void Open()
@@ -75,7 +75,7 @@ namespace Prototypes.<Name>
 
 ## Variant switcher
 
-Put it on a GameObject in the prototype scene and fill `variants` with each variant's root. It draws with IMGUI and reads keys from IMGUI events, and skips the arrow keys while an IMGUI text field has keyboard focus. When the prototype has uGUI or UI Toolkit text fields, extend the guard with their focus check (the selected input field's `isFocused`, or the panel's focused element being a `TextField`).
+Put it on a GameObject in the prototype scene and fill `variants` with each variant's root. It draws with IMGUI and reads keys from IMGUI events, and skips the arrow keys while an IMGUI text field has keyboard focus. When the prototype has uGUI or UI Toolkit text fields, extend the guard with their focus check (unverified here: the selected input field's `isFocused`, or the panel's focused element being a `TextField`).
 
 ```csharp
 using UnityEngine;
@@ -89,8 +89,11 @@ namespace Prototypes.<Name>
 
         void Start() => Show(0);
 
+        void Step(int delta) => Show(Current + delta);
+
         public void Show(int index)
         {
+            if (variants == null || variants.Length == 0) { Debug.LogWarning("[prototype] no variants assigned"); return; }
             Current = (index % variants.Length + variants.Length) % variants.Length;
             for (int i = 0; i < variants.Length; i++) variants[i].SetActive(i == Current);
             Debug.Log($"[prototype] variant {Current}: {variants[Current].name}");
@@ -101,16 +104,17 @@ namespace Prototypes.<Name>
             var e = Event.current;
             if (e.type == EventType.KeyDown && GUIUtility.keyboardControl == 0)
             {
-                if (e.keyCode == KeyCode.LeftArrow) { Show(Current - 1); e.Use(); }
-                else if (e.keyCode == KeyCode.RightArrow) { Show(Current + 1); e.Use(); }
+                if (e.keyCode == KeyCode.LeftArrow) { Step(-1); e.Use(); }
+                else if (e.keyCode == KeyCode.RightArrow) { Step(1); e.Use(); }
             }
 
+            if (variants == null || variants.Length == 0) return;
             const float width = 320, height = 36;
             var bar = new Rect((Screen.width - width) / 2, Screen.height - height - 12, width, height);
             GUI.Box(bar, GUIContent.none);
-            if (GUI.Button(new Rect(bar.x + 4, bar.y + 4, 40, height - 8), "<")) Show(Current - 1);
+            if (GUI.Button(new Rect(bar.x + 4, bar.y + 4, 40, height - 8), "<")) Step(-1);
             GUI.Label(new Rect(bar.x + 50, bar.y + 8, width - 100, height - 8), $"{Current + 1}/{variants.Length}: {variants[Current].name}");
-            if (GUI.Button(new Rect(bar.xMax - 44, bar.y + 4, 40, height - 8), ">")) Show(Current + 1);
+            if (GUI.Button(new Rect(bar.xMax - 44, bar.y + 4, 40, height - 8), ">")) Step(1);
         }
     }
 }
