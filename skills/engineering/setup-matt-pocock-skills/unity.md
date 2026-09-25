@@ -57,3 +57,9 @@ Owner: `unity-code-lifecycle`.
 
 - **Reload does not matter**: `yes` when statics need not be written as if domain reload is off.
 - **Lifecycle API**: the static reset API that new code with no local precedent uses: the lifecycle attributes and `[AutoStaticsCleanup]`, or the pre-6.5 fallbacks.
+
+## Prototype
+
+Owner: `unity-prototyping`.
+
+- **Prototype folder**: the folder, under the Unity project's `Assets/`, that holds one subfolder per throwaway prototype.

@@ -61,7 +61,7 @@ The defaults are the five canonical roles, each label string equal to its name: 
 
 Offer **multi-context** (a root `CONTEXT-MAP.md` pointing to per-context `CONTEXT.md` files) only when exploration found monorepo signals. Then confirm which layout they want.
 
-**Section D: Unity.** Only in a Unity repo: follow [unity-setup.md](./unity-setup.md), which confirms the Unity facts in one list, asks the Unity policies as one question, and drafts `docs/agents/unity.md` from the seed [unity.md](./unity.md).
+**Section D: Unity.** Only in a Unity repo: follow [unity-setup.md](./unity-setup.md), which confirms the Unity facts in one list, asks the Unity policies as one question and the prototype folder, and drafts `docs/agents/unity.md` from the seed [unity.md](./unity.md).
 
 ### 3. Confirm and edit
 

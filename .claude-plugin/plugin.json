@@ -50,6 +50,7 @@
     "./skills/unity/unity-assemblies",
     "./skills/unity/unity-serialization",
     "./skills/unity/unity-testing",
-    "./skills/unity/unity-code-lifecycle"
+    "./skills/unity/unity-code-lifecycle",
+    "./skills/unity/unity-prototyping"
   ]
 }

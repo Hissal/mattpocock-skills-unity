@@ -6,7 +6,7 @@ Those files are the only thing that varies between repos. The skills themselves 
 
 It is a prompt-driven skill, not a deterministic script. It reads your `git remote`, your existing `CLAUDE.md`, your existing `CONTEXT.md`, proposes what it found, and waits for you to confirm before writing anything.
 
-In a Unity repo it also writes the Unity config, `docs/agents/unity.md`: where the Unity project sits, which of your own docs hold your Unity conventions, how Unity checks may run here, and how your assemblies, serialization and statics depart from the Unity skills' rules, each recorded only where it differs from the [Unity skills](https://github.com/Hissal/mattpocock-skills-unity/tree/main/skills/unity)' defaults. It finds the facts itself and shows them as one list to correct, then asks one "keep the defaults?" question for the policies. In any other repo, nothing Unity appears.
+In a Unity repo it also writes the Unity config, `docs/agents/unity.md`: where the Unity project sits, which of your own docs hold your Unity conventions, how Unity checks may run here, and how your assemblies, serialization and statics depart from the Unity skills' rules, and where throwaway prototypes go, each recorded only where it differs from the [Unity skills](https://github.com/Hissal/mattpocock-skills-unity/tree/main/skills/unity)' defaults. It finds the facts itself and shows them as one list to correct, then asks one "keep the defaults?" question for the policies. It always asks where prototypes go, explaining how each candidate folder behaves in git, and creates a new prototype folder that ignores its own contents so work in progress never lands on `main`. In any other repo, nothing Unity appears.
 
 ## When to reach for it
 
