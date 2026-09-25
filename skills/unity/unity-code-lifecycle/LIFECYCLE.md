@@ -7,15 +7,17 @@ Each goes on a static, parameterless, `void` method. None exists before 6.5.
 | Attribute | Namespace | Fires | Older API it replaces |
 |---|---|---|---|
 | `[OnCodeLoaded]` | `Unity.Scripting.LifecycleManagement` | After assemblies load: initial load (Editor and Player), and after each code reload (Editor) | None |
-| `[OnCodeInitializing]` | `Unity.Scripting.LifecycleManagement` | After managed objects are deserialized, before `Awake`/`OnEnable`; on initial load, before the first scene loads | `[InitializeOnLoad]`, `[InitializeOnLoadMethod]`, `[RuntimeInitializeOnLoadMethod(SubsystemRegistration)]` |
+| `[OnCodeInitializing]` | `Unity.Scripting.LifecycleManagement` | After managed objects are deserialized, before `Awake`/`OnEnable`; on initial load, before the first scene loads | `[InitializeOnLoad]`, `[InitializeOnLoadMethod]` (and `SubsystemRegistration` as a load hook, see below) |
 | `[OnCodeDeinitializing]` | `Unity.Scripting.LifecycleManagement` | Before managed objects are serialized for a code reload | None |
 | `[OnCodeUnloading]` | `Unity.Scripting.LifecycleManagement` | Before assemblies unload for a code reload, and on shutdown | `AssemblyReloadEvents.beforeAssemblyReload` |
-| `[OnEnteringPlayMode]` | `UnityEngine` | Entering Play mode, after a code reload in Play mode, and at Player startup | `PlayModeStateChange.EnteredPlayMode`; timing of `[InitializeOnEnterPlayMode]` |
+| `[OnEnteringPlayMode]` | `UnityEngine` | Entering Play mode, after a code reload in Play mode, and at Player startup | `PlayModeStateChange.EnteredPlayMode`; timing of `[InitializeOnEnterPlayMode]`; `SubsystemRegistration` as a per-Play reset |
 | `[OnExitingPlayMode]` | `UnityEngine` | Exiting Play mode, before a code reload in Play mode, and before Player quit | `PlayModeStateChange.ExitingPlayMode` |
 | `[OnEnteringEditMode]` | `UnityEditor.Scripting.LifecycleManagement` | Returning to Edit mode, and after a code reload in Edit mode | `PlayModeStateChange.EnteredEditMode` |
 | `[OnExitingEditMode]` | `UnityEditor.Scripting.LifecycleManagement` | Before entering Play mode, and before a code reload in Edit mode | `PlayModeStateChange.ExitingEditMode` |
 
-The Play mode pair lives in `UnityEngine`, so runtime scripts use it without `#if UNITY_EDITOR`. The Edit mode pair is Editor-only.
+The Play mode pair lives in `UnityEngine`, so runtime scripts use it without `#if UNITY_EDITOR`, and it runs in players too. The Edit mode pair is Editor-only.
+
+**`SubsystemRegistration` has two replacements.** Unity's 6.6 API page for it says "For new code, use OnCodeInitializingAttribute instead", a mapping by load timing. But with domain reload off, `[OnCodeInitializing]` never fires on entering Play mode, while `SubsystemRegistration` fires on every Play entry. So a `SubsystemRegistration` method that resets statics moves to `[OnEnteringPlayMode]` (or `[AutoStaticsCleanup]`); moving it to `[OnCodeInitializing]` brings back every second-Play bug it was there to prevent. Code that needs a specific load point (before or after the first scene loads) keeps its `RuntimeInitializeOnLoadMethod` load type, which also fires on every Play entry.
 
 ## What fires on a Play session
 
@@ -37,6 +39,8 @@ Entering Play mode, reload off:
 With reload on, a full code reload (`[OnCodeDeinitializing]`, `[OnCodeUnloading]`, then `[InitializeOnLoad]`, `[OnCodeLoaded]`, `[InitializeOnEnterPlayMode]`, `[OnCodeInitializing]`, `[InitializeOnLoadMethod]`) runs between steps 1 and 3.
 
 Exiting Play mode: `playModeStateChanged(ExitingPlayMode)`, `[OnExitingPlayMode]`, the `[AutoStaticsCleanup]` reset, `[OnEnteringEditMode]`, `playModeStateChanged(EnteredEditMode)`.
+
+Windows release player, startup to quit: `[OnCodeLoaded]`, `[OnCodeInitializing]`, `[OnEnteringPlayMode]`, `SubsystemRegistration`, `AfterAssembliesLoaded`, `BeforeSceneLoad`, `Awake`, `AfterSceneLoad`, `Start`, then on `Application.Quit`: `OnApplicationQuit`, `[OnExitingPlayMode]`, `[OnCodeUnloading]`. `[OnCodeLoaded]` runs before the engine is ready there: calling `Time.frameCount` from it crashed the player.
 
 The reset is itself registered as a lifecycle callback, so its place among the callbacks on the same transition is an observation, not a documented order.
 
