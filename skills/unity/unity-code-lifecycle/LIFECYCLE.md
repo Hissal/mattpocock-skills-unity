@@ -2,7 +2,7 @@
 
 ## The eight lifecycle attributes (6.5 and later)
 
-Each goes on a static, parameterless, `void` method in a `partial` type (`UAC0031` otherwise). None exists before 6.5.
+Each goes on a static, parameterless, `void` method. None exists before 6.5.
 
 | Attribute | Namespace | Fires | Older API it replaces |
 |---|---|---|---|
@@ -38,15 +38,13 @@ With reload on, a full code reload (`[OnCodeDeinitializing]`, `[OnCodeUnloading]
 
 Exiting Play mode: `playModeStateChanged(ExitingPlayMode)`, `[OnExitingPlayMode]`, the `[AutoStaticsCleanup]` reset, `[OnEnteringEditMode]`, `playModeStateChanged(EnteredEditMode)`.
 
-The reset is itself registered as a lifecycle callback, and the order between callbacks on the same transition is not documented. Keep each static under one mechanism.
+The reset is itself registered as a lifecycle callback, so its place among the callbacks on the same transition is an observation, not a documented order.
 
-## `[AutoStaticsCleanup]` in detail
+## `[AutoStaticsCleanup]` details
 
 - Takes no arguments: there is no enter-only or exit-only form.
-- On a member: a field gets its initializer again (`= new()` builds a fresh instance), or `default` with no initializer; a property or event likewise. An event resets to `null`, dropping every subscriber.
-- A `static readonly` field keeps its instance and gets `Clear()`, when its type is a collection or has a parameterless `Clear()`; its initializer must be omitted, `new()`, or the exact declared type. Any other readonly type breaks generation for the whole assembly (warning `CS8785`).
-- On a type: every static member resets, except those marked `[NoAutoStaticsCleanup]`.
-- Works with no `.globalconfig`, in an asmdef assembly and in `Assembly-CSharp`. A `<asmdefName>.globalconfig` can turn generation off (`build_property.UnityEnableAutoStaticsCleanupCodeGen`) or the UAL analyzer on (`build_property.UnityEnableAutoStaticsCleanupAnalysis`); the analyzer flags a static constructor next to cleaned members as `UAL0014`.
+- A `static readonly` collection's initializer must be omitted, `new()`, or the exact declared type.
+- A `<asmdefName>.globalconfig` can turn generation off (`build_property.UnityEnableAutoStaticsCleanupCodeGen`) or the UAL analyzer on (`build_property.UnityEnableAutoStaticsCleanupAnalysis`); the analyzer flags a static constructor next to cleaned members as `UAL0014`.
 
 ## Pre-6.5 mapping
 

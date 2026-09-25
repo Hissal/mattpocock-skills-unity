@@ -5,7 +5,7 @@ description: Unity code lifecycle rules. Use when adding or changing static stat
 
 # Unity code lifecycle
 
-This repo's Unity config (`docs/agents/unity.md`), if present, overrides these defaults. Its **Code lifecycle** fields can say domain reload does not matter here, or name the lifecycle API the repo prefers.
+This repo's Unity config (`docs/agents/unity.md`), if present, overrides these defaults, including its **Code lifecycle** fields (domain reload does not matter here; the lifecycle API the repo prefers).
 
 This skill makes statics, singletons and static events safe across Play sessions. Whether to use them at all is the repo's design call, made in its Unity config or conventions docs. Asmdefs and what triggers a recompile belong to `unity-assemblies`; resetting statics inside a test belongs to `unity-testing`.
 
@@ -37,7 +37,7 @@ This skill covers domain reload. With scene reload also off, scene objects are n
 ## Static events and singletons
 
 - **Static event**: reset to `null` on entering Play mode (`[AutoStaticsCleanup]` on the event, or the fallback assigning `null`), so last session's subscribers never fire.
-- **MonoBehaviour singleton**: clear the static instance field on entering Play mode. With reload off it still references last session's destroyed object: `== null` reports it destroyed, but `is null`, `?.` and `??` see a live reference.
+- **MonoBehaviour singleton**: clear the static instance field on entering Play mode. With reload off it still references last session's destroyed object: `== null` reports it destroyed, but `is null` and `??` see a live reference.
 
 ## Load-code hazards
 
@@ -54,5 +54,5 @@ When scanning Unity code for architectural friction, singletons and static event
 This skill names the checks; call `unity-verification` through the Skill tool for how Unity runs them, and put the result in its report.
 
 - **Text check**, on every new or changed static in the diff (fields, properties, events, singleton instance fields): each has a reset path (`[AutoStaticsCleanup]`, a callback, or the pre-6.5 fallback) or a deliberate `[NoAutoStaticsCleanup]`. Every type carrying a lifecycle attribute or `[AutoStaticsCleanup]` is `partial`. The same check applies in review.
-- **Compile**: after adding `[AutoStaticsCleanup]`, grep the Editor log for `CS8785` from `AutoStaticsCleanupCodeGenerator`; none may appear. A clean `recompile` result does not show this warning.
-- **Runtime**: the module's PlayMode tests, when it has them. Otherwise the report lists the change as unvalidated: not checked across two Play sessions. The PlayMode tests are the only runtime check; an ad-hoc double Play run does not stand in for them.
+- **Compile**: after adding `[AutoStaticsCleanup]`, grep the Editor log for `CS8785`; a clean `recompile` result does not show it.
+- **Runtime**: the module's PlayMode tests, when it has them. Otherwise the report lists the change as unvalidated: not checked across two Play sessions. The PlayMode tests are the only runtime check this skill runs.
