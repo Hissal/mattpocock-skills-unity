@@ -23,7 +23,8 @@ Offer at most once; without a yes, build in Unity.
 Each prototype gets `<prototype folder>/<name>/`: its scripts, scenes and assets, nothing outside it. The prototype folder is the config's **Prototype folder** field, or `Assets/_Prototypes/` in the Unity project (in a package-only repo, ask which project hosts it).
 
 - An existing folder is used as found. Know how it behaves in git before writing to it (`git check-ignore -v <folder>/x`): **committed** means the prototype must never be committed on the working branch; **ignored** (by a `.gitignore` anywhere) means nothing inside reaches a branch until captured with `git add -f`.
-- A missing default folder is created self-ignoring: a `.gitignore` of `*` then `!.gitignore` inside it, so the folder exists on every clone and nothing else in it can be committed by accident. Commit the `.gitignore` and the folder's own `.meta` once Unity has made it, and say so to the user.
+- A missing folder that `git check-ignore -v <folder>/x` shows ignored is gitignored on purpose (a fresh clone has none): create it plain.
+- Any other missing folder is created self-ignoring: a `.gitignore` of `*` then `!.gitignore` inside it, so the folder exists on every clone and nothing else in it can be committed by accident. Commit the `.gitignore` and the folder's own `.meta` once Unity has made it, and say so to the user.
 
 ## Isolation
 

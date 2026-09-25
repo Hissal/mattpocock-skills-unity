@@ -33,6 +33,7 @@ Already recorded elsewhere, cited rather than repeated: `autoReferenced`, `defin
 
 - A `.gitignore` inside a folder applies to paths below it; `*` then `!.gitignore` ignores everything there except that file, so the folder exists on every clone while its contents never get committed by `git add -A`. [gitignore](https://git-scm.com/docs/gitignore)
 - `git add -f` adds "otherwise ignored files". [git-add](https://git-scm.com/docs/git-add)
+- A pattern with a leading `/` is relative to the directory of the `.gitignore` holding it. [gitignore](https://git-scm.com/docs/gitignore). **Observed** (scratch git repo, 2026-09-25): a nested project `Game/` whose own `.gitignore` held `/Assets/_Prototypes/` and `/Assets/_Prototypes.meta` ignored both `Game/Assets/_Prototypes/` and `Game/Assets/_Prototypes.meta`; the same two paths prefixed with `/Game` in the root `.gitignore` did the same; and `git add -f` on a prototype subfolder and its `.meta` staged them under either.
 - Prior art, read-only on a real Unity repo (2026-09-25): a folder under `Assets/` holding a `.gitignore` of `*`, `!.gitignore` and one readme exception, with the folder's own `.meta` and the `.gitignore` committed, and everything else inside it untracked.
 
 ## Sandbox checks for the `unity-prototyping` skill

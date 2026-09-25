@@ -67,7 +67,13 @@ Ask this even when every other default is kept, as its own question. List each d
 
 Offer them alongside a new `Assets/_Prototypes/` (the `unity-prototyping` default, recommended when no candidate is ignored). Once the user picks an existing folder, suggest a subpath that follows its subfolders' naming convention (a folder whose subfolders are named `Dev@-<Name>` suggests `Dev@-Prototypes/`), and let them take or change it.
 
-A new folder (the default, or a new subpath) is created self-ignoring now: the folder, with a `.gitignore` inside it of `*` then `!.gitignore`. Tell the user to commit that `.gitignore`, and the folder's `.meta` once Unity has imported it. The **Prototype folder** field is written only when the choice is not the default `Assets/_Prototypes/`.
+An existing folder is used as it is, with no git question. Only a folder setup creates (the default, or a new subpath) gets a git mode, and a new subpath inside a folder git already ignores inherits that and gets none either. Otherwise ask the mode as one question with three options:
+
+1. **Self-ignoring** (recommended): create the folder now with a `.gitignore` inside it of `*` then `!.gitignore`. The folder exists on every clone and nothing else in it can be committed by accident. Tell the user to commit that `.gitignore`, and the folder's `.meta` once Unity has imported it.
+2. **Gitignored**: add two lines to an existing `.gitignore`, one ignoring the folder and one ignoring its `.meta` (without the second, every clone's Unity writes an untracked `.meta` beside it). List every `.gitignore` that can hold them: the repo root's and any in a folder above the prototype folder (a nested Unity project often has its own), each with the lines as they would be written there, anchored with a leading `/` and relative to that file's folder (`/Assets/_Prototypes/` and `/Assets/_Prototypes.meta` in the project's own). Recommend the one that already ignores the project's `Library/`. Nothing is created now: a fresh clone has no folder, and `unity-prototyping` creates it when a prototype needs it.
+3. **Committed**: create the folder with a short `README.md` saying what it holds (git keeps no empty folder), and commit both and the folder's `.meta`. Every prototype inside then shows in `git status` on every branch and must be kept off it by hand, so offer this last.
+
+Before writing, check the result with `git check-ignore -v` on a path inside the folder and on its `.meta`. The **Prototype folder** field is written only when the choice is not the default `Assets/_Prototypes/`.
 
 ## 5. Draft, confirm, write
 
