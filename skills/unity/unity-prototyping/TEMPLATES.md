@@ -75,7 +75,7 @@ namespace Prototypes.<Name>
 
 ## Variant switcher
 
-Put it on a GameObject in the prototype scene and fill `variants` with each variant's root. It draws with IMGUI and reads keys from IMGUI events, and skips the arrow keys while an IMGUI text field has keyboard focus. When the prototype has uGUI or UI Toolkit text fields, extend the guard with their focus check (unverified here: the selected input field's `isFocused`, or the panel's focused element being a `TextField`).
+Put it on a GameObject in the prototype scene and fill `variants` with each variant's root. It draws with IMGUI and reads keys from IMGUI events, which arrive even when Active Input Handling is the Input System only, and skips the arrow keys while an IMGUI text field has keyboard focus. When the prototype has uGUI or UI Toolkit text fields, extend the guard with their focus check (unverified here: the selected input field's `isFocused`, or the panel's focused element being a `TextField`).
 
 ```csharp
 using UnityEngine;

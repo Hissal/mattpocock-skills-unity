@@ -50,7 +50,13 @@ The six checks the design requires ([#19](https://github.com/Hissal/mattpocock-s
 Found alongside, same run:
 
 - `EditorApplication.ExecuteMenuItem("Prototypes/T34 Feel")` through `run_script` ran the menu item and returned `true`, so an agent with a connected editor can run a prototype's entry point the way the human will.
-- The IMGUI switcher's `Show` (called through `run_script`) toggled the variants and logged the change, and Play mode logged no errors with Active Input Handling set to the Input System only. Its arrow keys and the text field focus guard were **not** driven by real key presses.
+- The IMGUI switcher's `Show` (called through `run_script`) toggled the variants and logged the change, and Play mode logged no errors with Active Input Handling set to the Input System only.
+
+### Demo test drive (human, 2026-09-25)
+
+Two demo prototypes built to the skill in the sandbox (`Assets/_t34/_Prototypes/`, same editor and settings): **Jump Feel**, three jump controllers switched live on a host scene (`SampleScene`) opened additively, reading movement through the Input System package (asmdef reference by `GUID:`); and **Combo Logic**, a pure C# model under an EditorWindow driver with free play and three scenario tabs. The agent ran each menu item through `ExecuteMenuItem`, cycled the variants, and captured the Game view (host lighting and sky, the variant, the bottom-centre bar). The maintainer then drove both by hand and reported everything working, including the switcher's arrow keys and its focus guard: with the IMGUI text field focused, arrows neither switched variant nor moved the capsule. So IMGUI key events reach `OnGUI` with Active Input Handling set to the Input System only, and `GUIUtility.keyboardControl` guards an IMGUI text field. The uGUI and UI Toolkit focus checks in `TEMPLATES.md` stay unverified.
+
+The Game view capture command wrote its PNG under `Assets/` (`save_path` resolved against it), which created an asset folder outside the prototype: pass a path outside `Assets/`, or delete what it made.
 
 ## Open questions / unverified
 
