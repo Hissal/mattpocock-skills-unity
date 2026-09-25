@@ -25,6 +25,9 @@ Find each fact without asking. The same detection as the `unity` router: the rep
 | Check runners | scripts that run the repo's text checks, compile or Unity tests (`Tools/`, `scripts/`, `package.json` scripts, a `Makefile`), and the ladder rung each performs | Verification: rung commands |
 | CI workflows | `.github/workflows/`, `.gitlab-ci.yml` and the like, for jobs that run Unity (`game-ci/`, `unity test`, `-runTests`, `-executeMethod`) | Verification: authoritative CI workflow |
 | Test filters | the filters or categories those runners and CI jobs pass (`-testFilter`, `-testCategory`, `-assemblyNames`) | Verification: test filters |
+| Test assembly layout | the folders and `name`s of existing test asmdefs (those referencing `nunit.framework.dll`, `UnityEngine.TestRunner` or `"optionalUnityReferences": ["TestAssemblies"]`), and any test layout rule in the conventions docs | Testing: test assembly layout |
+| Mocking library | a mocking DLL or package (`NSubstitute.dll`, `Moq.dll`, a `package.json` or `manifest.json` entry) referenced by test asmdefs | Testing: mocking library |
+| `com.unity.test-framework` | `Packages/manifest.json` of each project | shown, not written: `unity-testing` reads the manifest itself |
 | Build targets and method or profile | CI build steps (`targetPlatform`, `buildMethod`), build scripts calling `BuildPipeline.BuildPlayer`, Build Profile assets | Verification: build |
 | Assembly naming | the `name` of each existing `.asmdef`, and any naming rule in the conventions docs | Assemblies: naming convention |
 | Project-wide defines | `-define:` lines in a `csc.rsp` under `Assets/`, `scriptingDefineSymbols` in `ProjectSettings/ProjectSettings.asset`, defines in Build Profile assets | Assemblies: project-wide defines |

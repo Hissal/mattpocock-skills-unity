@@ -96,5 +96,6 @@ In a Unity repo the flows above hold as they are: each skill pulls in the Unity 
 - **`/unity-verification`**: checking a Unity change really compiles and works, when Unity cannot run here or the editor is open, or when you want to know what "verified" covered and what stayed unvalidated.
 - **`/unity-assemblies`**: code landing in the wrong assembly, an Editor-only API breaking the Player build, a type the compiler "cannot find" though it exists, or deciding where a new asmdef, reference or define should go.
 - **`/unity-serialization`**: renaming or moving anything Unity stores (a serialized field, type or enum, an asset or a script) without losing values or breaking references, or editing and reviewing scene, prefab and `.asset` files.
+- **`/unity-testing`**: writing or reviewing a Unity test, deciding between EditMode and PlayMode, setting up tests where none exist, a test that fails only under Unity, or which tests to run and how often.
 - **`/unity-code-lifecycle`**: adding a static, a singleton or a static event, writing code that runs on load, on a code reload, or on entering or exiting Play mode, or a bug that shows up only on the second Play.
 - **`/unity`**: a Unity question no line above fits. It finds the Unity project, reads the Unity config, and names any need no Unity skill covers yet.
