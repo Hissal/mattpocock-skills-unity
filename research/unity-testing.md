@@ -116,7 +116,7 @@ So in Edit mode tests, lifecycle methods on a plain MonoBehaviour never run. Eit
 Play mode variant: drop `"includePlatforms"` (empty means all platforms). `precompiledReferences` is ignored unless `overrideReferences` is true. [asmdef file format](https://docs.unity3d.com/6000.3/Documentation/Manual/assembly-definition-file-format.html). References can also be GUIDs (`"GUID:..."`), same page.
 
 - Selecting platforms other than Editor is what allows the assembly's Play mode tests to run on standalone players. [create a test assembly](https://docs.unity3d.com/6000.3/Documentation/Manual/test-framework/workflow-create-test-assembly.html)
-- Test assemblies are only included in a player build when `BuildOptions.IncludeTestAssemblies` is set or `PlayerSettings.playModeTestRunnerEnabled` (`TestBuildAssemblyFilter.cs`, bundled 1.6.0 source). The `UNITY_INCLUDE_TESTS` define constraint is the usual guard (meaning of that symbol in normal builds is **unverified** beyond this source reading).
+- Test assemblies are only included in a player build when `BuildOptions.IncludeTestAssemblies` is set or `PlayerSettings.playModeTestRunnerEnabled` (`TestBuildAssemblyFilter.cs`, bundled 1.6.0 source). The `UNITY_INCLUDE_TESTS` define constraint is the usual guard; a test assembly carrying it was observed left out of a normal Player build ([unity-assemblies.md](./unity-assemblies.md)).
 
 ## Writing tests: attributes and hooks
 

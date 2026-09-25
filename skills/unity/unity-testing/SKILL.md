@@ -36,7 +36,7 @@ C# versions of `tdd`'s good and bad tests, and of its mocking examples: [EXAMPLE
 
 ## Static state in tests
 
-Write tests as if domain reload is off, whatever the project setting, unless the user or the Unity config says it does not matter: reset every static the test touches in `[SetUp]`, and never rely on a fresh domain between tests. Tests in one run share one domain (a static set in one EditMode test is still set in the next), and with reload off statics also outlive the run. The reason: any Unity version can turn reload off in Enter Play Mode Options, 6.6 ships with it off, and a suite that already resets its statics survives a later switch to reload off, or to CoreCLR, with no migration. The production side (giving each static a reset path) is `unity-code-lifecycle`'s.
+Write tests as if domain reload is off, whatever the project setting, unless the user or the Unity config says it does not matter: reset every static the test touches in `[SetUp]`, and never rely on a fresh domain between tests. Tests in one run share one domain: a static set in one EditMode test is still set in the next. With reload off, expect statics to outlive the run too (not yet checked for PlayMode test runs). The reason, and the production side (giving each static a reset path), are `unity-code-lifecycle`'s: a suite that already resets its statics survives a switch to reload off, or to CoreCLR, with no migration.
 
 ## What tests cannot judge
 
@@ -65,19 +65,14 @@ For each behaviour, name the plain C# class that owns it and its EditMode `[Test
 
 ## Friction signals
 
-When scanning Unity code for architectural friction, the signals this skill owns: logic stuck in MonoBehaviours, out of EditMode's reach; and scene lookups (`Find*`, `FindObjectOfType`, `GetComponent` on other objects) standing in for dependencies that could be passed in. Report where they are; changing the design is the user's call.
+When scanning Unity code for architectural friction, the signals this skill owns: logic stuck in MonoBehaviours, out of EditMode's reach; and scene lookups (`Find*`, `FindObjectOfType`) standing in for dependencies that could be passed in. Report where they are; changing the design is the user's call.
 
 ## Reviewing test changes
 
-Check each changed test and test assembly for:
+Check each changed test against every EditMode trap and the static and mocking rules above, and each changed test assembly for:
 
 - a test asmdef beside its tests, with the mode its tests need (EditMode `includePlatforms: ["Editor"]` for anything using `UnityEditor`), in the layout of [ASSEMBLIES.md](ASSEMBLIES.md);
-- production code in a test assembly (it never reaches the Player);
-- an EditMode test that expects `Awake`, `OnEnable` or `Start` to run, or waits frames for them;
-- `Object.Destroy` in EditMode code;
-- an expected error log without `LogAssert.Expect` placed before it;
-- a static the test sets without a `[SetUp]` reset;
-- a mock of a UnityEngine type where the repo's own interface belongs.
+- production code in a test assembly (it never reaches the Player).
 
 ## Validation
 

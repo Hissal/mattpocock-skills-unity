@@ -25,4 +25,4 @@ An unexpected domain reload during a test fails it. A test that recompiles or en
 ## Scene tests
 
 - **EditMode**, scene content (every level has a spawn point): `EditorSceneManager.OpenScene(path)` in the test, and `EditorSceneManager.NewScene(NewSceneSetup.EmptyScene)` in `[TearDown]` to leave the scene behind. Never save the opened scene.
-- **PlayMode**, scene behaviour: `SceneManager.LoadScene(name)`, then `yield return null` before asserting (the load completes on the next frame). Per Unity's docs, `LoadScene` finds only scenes in the build profile.
+- **PlayMode**, scene behaviour: `SceneManager.LoadScene(name)`, then yield at least one frame before asserting, since the load is not immediate. Unity's `LoadScene` docs require the scene to be in the build profile (not yet checked in the sandbox).
