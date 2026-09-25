@@ -6,7 +6,7 @@ It never changes the code. The whole run produces one HTML file in your OS temp 
 
 Two filters keep the report from becoming generic cleanup advice. Every candidate has to pass the **deletion test**: would removing this module concentrate complexity behind a smaller interface, or just spread it across callers? Only the "concentrates" cases earn a card. And unless you point it at a specific area, it reads recent commit history first and biases the scan toward paths that are actively changing, on the grounds that a deepening in code nobody touches is a refactor you will never cash in.
 
-In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router to keep asset churn (scenes, prefabs, `.meta` files) out of the hotspot scan, and its explorer sub-agent asks it for Unity friction signals: logic stuck in MonoBehaviours, singletons and static events, asmdef tangles, and serialized fields acting as a hidden interface.
+In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router to keep asset churn (scenes, prefabs, `.meta` files and the like) out of the hotspot scan, and its explorer sub-agent asks it for Unity friction signals such as logic stuck in MonoBehaviours, singletons and static events, asmdef tangles, and serialized fields acting as a hidden interface.
 
 ## When to reach for it
 
