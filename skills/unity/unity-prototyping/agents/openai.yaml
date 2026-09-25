@@ -1,0 +1,3 @@
+interface:
+  display_name: "Unity prototyping"
+  short_description: "Build, run and remove Unity prototypes"

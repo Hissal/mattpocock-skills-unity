@@ -31,6 +31,7 @@ Find each fact without asking. The same detection as the `unity` router: the rep
 | Build targets and method or profile | CI build steps (`targetPlatform`, `buildMethod`), build scripts calling `BuildPipeline.BuildPlayer`, Build Profile assets | Verification: build |
 | Assembly naming | the `name` of each existing `.asmdef`, and any naming rule in the conventions docs | Assemblies: naming convention |
 | Project-wide defines | `-define:` lines in a `csc.rsp` under `Assets/`, `scriptingDefineSymbols` in `ProjectSettings/ProjectSettings.asset`, defines in Build Profile assets | Assemblies: project-wide defines |
+| Prototype folder candidates | folders under `Assets/` named for local, dev, sandbox, scratch or prototype work (`_Local`, `_Dev`, `_Sandbox`, `Prototypes`), and any folder holding its own `.gitignore`. For each, how it behaves in git: **committed**, **gitignored** (`git check-ignore -v <folder>/x` names the rule), or **self-ignoring** (its own `.gitignore` of `*`). Also the naming convention of its subfolders | Prototype: prototype folder |
 | Third-party serializer | a serializer package or plugin folder (Odin: `Assets/Plugins/Sirenix/`, `using Sirenix.Serialization`), and a conventions doc covering it | Serialization: third-party serializer |
 
 No editor version: the Unity skills read `ProjectVersion.txt`, or the package's `unity` field, when a version gate matters.
@@ -57,12 +58,29 @@ With an existing config, a policy it already sets is listed with that value inst
 
 On **yes**, write no policy beyond those. Only on **no**, ask which to change, then take each of those one at a time. A policy the user sets back to its default is not written.
 
-## 4. Draft, confirm, write
+## 4. Ask the prototype folder, always
+
+Ask this even when every other default is kept, as its own question. List each discovered candidate with its git behaviour and what that means for a prototype inside it:
+
+- **committed**: work in progress shows up in `git status` on every branch, and must never be committed there;
+- **gitignored** or **self-ignoring**: nothing inside reaches a branch until captured with `git add -f`; self-ignoring also keeps the folder on every clone.
+
+Offer them alongside a new `Assets/_Prototypes/` (the `unity-prototyping` default, recommended when no candidate is ignored). Once the user picks an existing folder, suggest a subpath that follows its subfolders' naming convention (a folder whose subfolders are named `Dev@-<Name>` suggests `Dev@-Prototypes/`), and let them take or change it.
+
+An existing folder is used as it is, with no git question. Only a folder setup creates (the default, or a new subpath) gets a git mode, and a new subpath inside a folder git already ignores inherits that and gets none either. Otherwise ask the mode as one question with three options:
+
+1. **Self-ignoring** (recommended): create the folder now with a `.gitignore` inside it of `*` then `!.gitignore`. The folder exists on every clone and nothing else in it can be committed by accident. Tell the user to commit that `.gitignore`, and the folder's `.meta` once Unity has imported it.
+2. **Gitignored**: add two lines to an existing `.gitignore`, one ignoring the folder and one ignoring its `.meta` (without the second, every clone's Unity writes an untracked `.meta` beside it). List every `.gitignore` that can hold them: the repo root's and any in a folder above the prototype folder (a nested Unity project often has its own), each with the lines as they would be written there, anchored with a leading `/` and relative to that file's folder (`/Assets/_Prototypes/` and `/Assets/_Prototypes.meta` in the project's own). Recommend the one that already ignores the project's `Library/`. Nothing is created now: a fresh clone has no folder, and `unity-prototyping` creates it when a prototype needs it.
+3. **Committed**: create the folder with a short `README.md` saying what it holds (git keeps no empty folder), and commit both and the folder's `.meta`. Every prototype inside then shows in `git status` on every branch and must be kept off it by hand, so offer this last.
+
+Before writing, check the result with `git check-ignore -v` on a path inside the folder and on its `.meta`. The **Prototype folder** field is written only when the choice is not the default `Assets/_Prototypes/`.
+
+## 5. Draft, confirm, write
 
 Draft `docs/agents/unity.md` from the seed: keep its title and header, then each section that has at least one value, holding only the field lines with values. Drop the owner lines, the placeholder meanings and every empty field and section. Show the draft with the rest of setup's step 3, alongside the `### Unity` sub-block, and let the user edit before writing.
 
 **Re-running**: update the file in place. Change only field lines whose value changed, add new ones, and remove ones now equal to the default. Every other line (a note, a field this procedure does not know, anything hand-written) stays where it is, word for word.
 
-## 5. Done
+## 6. Done
 
 Add to setup's closing message: the `unity` router and the Unity skills now read `docs/agents/unity.md`, it can be edited by hand, and re-running setup after a skills update picks up any new Unity fields.

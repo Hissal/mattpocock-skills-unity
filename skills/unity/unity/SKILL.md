@@ -59,6 +59,7 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | writing code that runs on load, on a code reload, or on entering or exiting Play mode | unity-code-lifecycle |
 | state leaking between Play sessions, or a bug only on the second Play | unity-code-lifecycle |
 | reviewing a change that adds or changes statics or load code | unity-code-lifecycle |
+| where a prototype lives, how it runs and is removed, and whether an HTML one fits | unity-prototyping |
 | scanning Unity code for architectural friction | unity-testing, unity-assemblies, unity-code-lifecycle, unity-serialization |
 
 Rows land with the Unity skill that owns them, so the table names only skills that exist.
