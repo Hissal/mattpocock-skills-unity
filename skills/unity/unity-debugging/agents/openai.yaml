@@ -1,0 +1,3 @@
+interface:
+  display_name: "Unity debugging"
+  short_description: "Reproduce, observe and measure Unity bugs"

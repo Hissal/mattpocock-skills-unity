@@ -7,7 +7,7 @@ description: Unity prototyping rules. Use when building a throwaway prototype in
 
 This repo's Unity config (`docs/agents/unity.md`), if present, overrides these defaults, including its **Prototype folder** field.
 
-This skill owns the Unity side of a prototype: where it lives, how it stays out of production code and player builds, its scenes, how it runs, and how it is captured and removed. What a prototype is for, its branches and its capture rule stay with the `prototype` skill; its rule to locate a prototype next to the code it serves becomes the prototype folder below, which keeps it out of `main` and player builds. It calls siblings through the Skill tool for their mechanics: `unity-assemblies` for the asmdef, `unity-serialization` for the GUID grep and deleting with `.meta`, `unity-verification` for compiling, running C# in the Editor and entering Play.
+This skill owns the Unity side of a prototype: where it lives, how it stays out of production code and player builds, its scenes, how it runs, and how it is captured and removed. What a prototype is for, its branches and its capture rule stay with the `prototype` skill; its rule to locate a prototype next to the code it serves becomes the prototype folder below, which keeps it out of `main` and player builds. It calls siblings through the Skill tool for their mechanics: `unity-assemblies` for the asmdef, `unity-serialization` for the GUID grep and deleting with `.meta`, `unity-verification` for compiling and running C# in the Editor, `unity-debugging` for driving Play mode.
 
 ## In Unity or in HTML
 

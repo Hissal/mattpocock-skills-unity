@@ -51,6 +51,7 @@
     "./skills/unity/unity-serialization",
     "./skills/unity/unity-testing",
     "./skills/unity/unity-code-lifecycle",
-    "./skills/unity/unity-prototyping"
+    "./skills/unity/unity-prototyping",
+    "./skills/unity/unity-debugging"
   ]
 }
