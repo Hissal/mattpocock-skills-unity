@@ -12,3 +12,4 @@ Model- or user-reachable (rich trigger phrasing so the model can reach for them)
 
 - **[unity](./unity/SKILL.md)**: Unity knowledge entry point. Detects a Unity repo, reads its Unity config, and routes a need to the Unity skills that answer it.
 - **[unity-verification](./unity-verification/SKILL.md)**: Unity verification rules. Picks the cheapest check on the Verification ladder that can catch a change's risk, runs it in the connected editor or headless, reads the result, and reports what stayed unvalidated.
+- **[unity-assemblies](./unity-assemblies/SKILL.md)**: Unity assembly and compilation rules. Keeps code in the right assembly, the Editor/runtime split and asmdef GUID references intact, proposes asmdef changes rather than making them, and maps assembly names and GUIDs with a script.

@@ -46,6 +46,7 @@
     "./skills/productivity/wait-what",
     "./skills/productivity/writing-for-agents",
     "./skills/unity/unity",
-    "./skills/unity/unity-verification"
+    "./skills/unity/unity-verification",
+    "./skills/unity/unity-assemblies"
   ]
 }
