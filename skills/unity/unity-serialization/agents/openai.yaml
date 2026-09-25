@@ -1,0 +1,3 @@
+interface:
+  display_name: "Unity serialization"
+  short_description: "Rename, move and edit Unity serialized data safely"

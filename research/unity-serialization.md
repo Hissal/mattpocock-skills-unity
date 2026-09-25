@@ -63,7 +63,7 @@ Supported types: primitives (`int`, `float`, `double`, `bool`, `string`, ...), e
 
 Not supported (through 6.5): "multilevel types (multidimensional arrays, jagged arrays, dictionaries, and nested container types)". Wrap an inner list in a `[Serializable]` class to nest. ([script-serialization-rules, 6000.0](https://docs.unity3d.com/6000.0/Documentation/Manual/script-serialization-rules.html); still stated in [6000.3](https://docs.unity3d.com/6000.3/Documentation/Manual/script-serialization-rules.html))
 
-Properties are not serialized. A property's backing field can be, for example `[field: SerializeField]` on an auto-property; the stored name is the compiler-generated backing field name. ([script-serialization-rules, 6000.6](https://docs.unity3d.com/6000.6/Documentation/Manual/script-serialization-rules.html)) Note: this means converting a plain field to an auto-property (or back) changes the serialized name and loses data unless handled. Inference, **unverified** as a doc statement.
+Properties are not serialized. A property's backing field can be, for example `[field: SerializeField]` on an auto-property; the stored name is the compiler-generated backing field name. ([script-serialization-rules, 6000.6](https://docs.unity3d.com/6000.6/Documentation/Manual/script-serialization-rules.html)) Note: this means converting a plain field to an auto-property (or back) changes the serialized name and loses data unless handled. Inference as a doc statement, **observed** in the sandbox (section 10, check 4).
 
 Generic field types (for example `MyClass<int>`) serialize directly since Unity 2020.1, without a concrete subclass. ([script-Serialization, 2020.1](https://docs.unity3d.com/2020.1/Documentation/Manual/script-Serialization.html))
 
@@ -100,7 +100,7 @@ Generic field types (for example `MyClass<int>`) serialize directly since Unity 
 - Only removable once every scene and asset has been re-saved with the new name; leaving it in place is harmless. ([FormerlySerializedAsAttribute](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Serialization.FormerlySerializedAsAttribute.html))
 - Unity upgrades old data in memory only; files keep the old name until re-saved. `AssetDatabase.ForceReserializeAssets` writes the upgrade to disk and is the documented step before removing `FormerlySerializedAs`. Call it only from a direct user action (menu item), never from callbacks like `OnEnable`. ([ForceReserializeAssets, 6000.0](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/AssetDatabase.ForceReserializeAssets.html))
 - Changing a field's type is not covered by this attribute. **Unverified** how Unity converts values across type changes; treat a type change as data loss unless tested.
-- **Unverified**: whether prefab override `propertyPath` entries (which use the field name) are migrated by `FormerlySerializedAs` in all versions. Check overrides after renaming fields on prefab-heavy components.
+- Whether prefab override `propertyPath` entries (which use the field name) are migrated by `FormerlySerializedAs`: **observed** on 6000.6.2f1 (section 10, checks 2 and 3). The attribute applies old-path overrides on load; on disk, a reserialized prefab gains the new path beside the old, while a reserialized scene keeps only the old path.
 
 ### `MovedFrom` (type renames, for `SerializeReference`)
 
@@ -188,6 +188,38 @@ Package docs are versioned separately from the Editor; checked against Addressab
 - Duplication trap: content referenced both from Addressables and from built-in scene data or `Resources` is duplicated on disk and in memory; a non-Addressable scene referencing an Addressable asset directly gets its own copy. ([migration guide, 2.1](https://docs.unity3d.com/Packages/com.unity.addressables@2.1/manual/AddressableAssetsMigrationGuide.html))
 - Unity 6.6 adds a content directory build path and a Content Directory schema in Addressables. ([WhatsNewUnity66](https://docs.unity3d.com/6000.6/Documentation/Manual/WhatsNewUnity66.html))
 - **Unverified**: the on-disk layout of Addressables settings (`Assets/AddressableAssetsData`, group `.asset` files listing entries by GUID). Commonly observed, not found in the docs checked.
+
+## 10. Sandbox checks for the `unity-serialization` skill
+
+The five checks the design ([#9](https://github.com/Hissal/mattpocock-skills-unity/issues/9)) requires, plus what surfaced while running them. All **observed** on 2026-09-24 in `unity-sandbox/` (6000.6.2f1, `com.unity.pipeline` through a resident headless editor, CLI 1.0.0-beta.11, Windows 11). Values were read back through `SerializedObject` or reflection after each recompile; files were compared by hash before and after each write.
+
+1. **File-scoped namespace**: a MonoBehaviour and a ScriptableObject declared with `namespace T31.FileScoped;` (their own asmdef, `-langversion:10` in its `csc.rsp`) saved as `m_Script: {fileID: 0}` in a prefab and an `.asset`, with the field data present. `MonoScript.GetClass()` returned null for the file-scoped script, and the saved prefab loaded with one missing script (`GetMonoBehavioursWithMissingScriptCount` 1). A block-namespaced MonoBehaviour in the same asmdef saved its real `m_Script` GUID and loaded clean. The RaveRampage claim holds.
+2. **`FormerlySerializedAs` and override `propertyPath`s**: after renaming `oldName` to `newName` with the attribute, a scene instance overriding it (7), a variant (9), and a prefab nesting an instance with an override (5) all read the overridden value; the files on disk still said `propertyPath: oldName`. Unity applies old-path overrides through the attribute on load but writes nothing until a file is rewritten.
+3. **Scoped `ForceReserializeAssets(paths)`**: rewrote only the listed files. Of 170 files under `Assets/`, `Packages/` and `ProjectSettings/`, only the listed prefabs changed (their `.meta` files did not). What the rewrite does to overrides:
+   - A variant and a prefab nesting an overridden instance gained a `propertyPath: newName` entry and kept the `oldName` entry beside it.
+   - A scene holding an overridden prefab instance came out byte-identical: its override stayed on `oldName`. Opening, dirtying and saving the scene also left it on `oldName`. `PrefabUtility.RecordPrefabInstancePropertyModifications` on the instance's component, then a save, added `propertyPath: newName` (keeping the old entry).
+   - A scene holding a plain (non-prefab) object with the renamed field was rewritten to `newName`.
+   - After the attribute was removed: the prefab (1), variant (9), nested prefab (5) and the re-recorded scene (7) kept their values; the scene that was only force-reserialized lost its override (7 fell back to the prefab's 1).
+4. **Auto-property conversions**: field `speed` to `[field: SerializeField] float speed { get; set; }` without an attribute read 0 (was 5); with `[field: FormerlySerializedAs("speed")]` it read 5. Back from `[field: SerializeField] float Speed { get; set; }` to a field `Speed`: without an attribute 0, with `[FormerlySerializedAs("<Speed>k__BackingField")]` 5. The backing field serializes as `<Name>k__BackingField`.
+5. **Scope script**: a hand-built case with `B` inside `A` inside MonoBehaviour `C`. `SerializationScope.Find("T31.B")` listed exactly: a prefab with `C`, a prefab nesting it, a variant of it, a scene with a non-prefab `C` object, a scene holding the nesting prefab, a prefab with a subclass of `C`, a ScriptableObject `.asset` with `List<A>`, and two prefabs with a `[SerializeReference] IThing` host (one holding a type that contains `B`, one holding a type that does not: the closure is by host type, so the second is an over-reach). A prefab and a scene using only an unrelated component were left out. It took about 1.3 s through `run_script`; the headless `-executeMethod` entry wrote the same list (exit 0, about 41 s including editor start). Found while running it: without filtering, package types with a `[SerializeReference] object` field that have no script asset showed up as noise, so the script notes missing script assets only for project assemblies. `scope.sh` seeded with `C.cs` alone listed the five files reachable from `C`'s GUID and missed the subclass, `[SerializeReference]` and ScriptableObject hosts, as the design expects; seeded with all four host scripts it matched the Editor list.
+
+End to end with the shipped script (a fresh component `Q`, field `before` renamed to `after` with the attribute): `Find` listed four files (prefab, variant, nested prefab, scene); `Reserialize` with that list changed exactly those four files and re-recorded one scene instance; every override then carried `propertyPath: after`; after removing the attribute every value survived (prefab 1, variant 3, nested 5, scene instance 7, plain scene object 4).
+
+Extra checks (same day and setup, a second session), run so the skill could state these as fact:
+
+- **`MovedFrom`**: two `[SerializeReference]` classes moved from namespace `T31.OldNs` to `T31.NewNs`. The one carrying `[MovedFrom(false, sourceNamespace: "T31.OldNs")]` loaded as the new type with its value; the one without loaded as **null**.
+- **Missing managed-reference types**: `SerializationUtility.HasManagedReferencesWithMissingTypes` returned **false** on that host, and `GetManagedReferencesWithMissingTypes` returned an empty array, after load, after instantiating the prefab and after a forced reimport, even though the reference loaded as null. The file still held the old entry (`type: {class: Ref2, ns: T31.OldNs, asm: Assembly-CSharp}` with its data). `ForceReserializeAssets` on the host then **dropped** that data: the field became `rid: -2` with an empty `type: {class: , ns: , asm: }` entry. The `MovedFrom` reference was rewritten to `ns: T31.NewNs`. So re-saving a host loses a missing type's data, and the documented detection API cannot be trusted alone on 6000.6.2f1: grep the `references` `type:` lines instead.
+- **Enums**: a field set to `Blue` in `enum { Red, Green, Blue }` was stored as `c: 2`; after reordering to `{ Blue, Red, Green }` it read `Green`.
+- **Dictionaries on 6.6**: a public `Dictionary<string, int>` without `[SerializeField]` was not written at all; one with `[SerializeField]` was written as a `- key: / value:` list.
+- **`FormerlySerializedAs` inside a nested `[Serializable]` class**: renaming `Inner.oldInner` to `newInner` with the attribute kept the value (3) on a prefab.
+
+Found alongside:
+
+- `run_script --args` takes a JSON array of positional arguments (`'["T31.B"]'`); a bare string is rejected ("expects JArray"), and a `string[]` parameter takes a nested array.
+- `SerializationScope.Reserialize` refuses (throws before writing) while an open scene is dirty, and after its scene pass reopens the scenes that were open (checked with one clean scene open).
+- `eval` snippets reach project assemblies (`Assembly-CSharp`, `Assembly-CSharp-Editor`) directly.
+- Unity 6.6 writes `m_EditorClassIdentifier: <Assembly>::<Namespace.Class>` on MonoBehaviours; the script link is still `m_Script`.
+- A `[SerializeReference]` field is written as `rid: <id>` with a `references: version: 2, RefIds:` block whose entries carry `type: {class, ns, asm}`. A ScriptableObject `.asset` holds its main object at `--- !u!114 &11400000`.
 
 ## Open questions for the skill
 
