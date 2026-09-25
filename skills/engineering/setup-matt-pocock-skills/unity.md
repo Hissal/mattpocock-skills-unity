@@ -28,4 +28,4 @@ Owner: `unity-verification`.
 - **Test filters**: the test filters or categories the test rungs apply.
 - **Build**: the player build targets, and the build method or build profile.
 - **Authoritative CI workflow**: the workflow file whose result counts as the CI rung.
-- **Heavy-run warning**: whether to ask before a long run starts. Read by `unity-testing` too.
+- **Heavy-run warning**: whether to ask before a heavy run (a full suite, a PlayMode run or a player build) starts.

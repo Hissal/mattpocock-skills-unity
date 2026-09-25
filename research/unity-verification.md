@@ -139,6 +139,8 @@ Suggested ladder, cheapest first; stop at the first rung that can catch the fail
 
 Fields the per-repo config likely needs (derived from the findings above, not from a source): editor version source (`ProjectSettings/ProjectVersion.txt`); project path inside the repo; whether `com.unity.pipeline` is installed; the repo's text-check command; compile-only command if any; test assemblies or filters for EditMode and PlayMode; build targets and build method or profile; licence type available locally and in CI; where CI runs and which workflow is authoritative; whether a warmed checkout exists; which environments may launch an editor at all.
 
+Decided in [#13](https://github.com/Hissal/mattpocock-skills-unity/issues/13) (shipped by [#29](https://github.com/Hissal/mattpocock-skills-unity/issues/29)): the config records only what differs from the Unity skills' defaults, so it leaves out the editor version (read from `ProjectVersion.txt` when a gate matters), Pipeline presence (read from the manifest), licence type and warmed-checkout state (machine data, resolved at run time), and replaces the separate text-check and compile-only commands with one **rung commands** map.
+
 Open questions (unverified): behaviour of `unity build` when a GUI editor holds the project (`unity test` is answered in section 11); whether `unity license activate --personal` works unattended in a fresh container; Build Server licence terms for test runs; a supported, documented command to regenerate csproj files headlessly.
 
 ## 11. Sandbox checks for the `unity-verification` skill
