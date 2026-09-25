@@ -36,13 +36,13 @@ Entering Play mode, reload off:
 3. `[OnEnteringPlayMode]` (the first callback with `Application.isPlaying` true)
 4. `SubsystemRegistration`, `AfterAssembliesLoaded`, `BeforeSplashScreen`, `BeforeSceneLoad`, `Awake`, `OnEnable`, `AfterSceneLoad`, `Start`, `playModeStateChanged(EnteredPlayMode)`
 
-With reload on, a full code reload (`[OnCodeDeinitializing]`, `[OnCodeUnloading]`, then `[InitializeOnLoad]`, `[OnCodeLoaded]`, `[InitializeOnEnterPlayMode]`, `[OnCodeInitializing]`, `[InitializeOnLoadMethod]`) runs between steps 1 and 3.
+With reload on, a full code reload (`[OnCodeDeinitializing]`, `[OnCodeUnloading]`, then `[InitializeOnLoad]`, `[OnCodeLoaded]`, `[InitializeOnEnterPlayMode]`, `[OnCodeInitializing]`, `[InitializeOnLoadMethod]`) runs after step 1's `playModeStateChanged(ExitingEditMode)`, with `[InitializeOnEnterPlayMode]` inside it. The reset (step 2) runs after the reload, so it clears what `[OnCodeInitializing]` just set up.
 
 Exiting Play mode: `playModeStateChanged(ExitingPlayMode)`, `[OnExitingPlayMode]`, the `[AutoStaticsCleanup]` reset, `[OnEnteringEditMode]`, `playModeStateChanged(EnteredEditMode)`.
 
-Windows release player, startup to quit: `[OnCodeLoaded]`, `[OnCodeInitializing]`, `[OnEnteringPlayMode]`, `SubsystemRegistration`, `AfterAssembliesLoaded`, `BeforeSceneLoad`, `Awake`, `AfterSceneLoad`, `Start`, then on `Application.Quit`: `OnApplicationQuit`, `[OnExitingPlayMode]`, `[OnCodeUnloading]`. `[OnCodeLoaded]` runs before the engine is ready there: calling `Time.frameCount` from it crashed the player.
+Windows release player, startup to quit: `[OnCodeLoaded]`, `[OnCodeInitializing]`, the `[AutoStaticsCleanup]` reset, `[OnEnteringPlayMode]`, `SubsystemRegistration`, `AfterAssembliesLoaded`, `BeforeSceneLoad`, `Awake`, `AfterSceneLoad`, `Start`, then on `Application.Quit`: `OnApplicationQuit`, `[OnExitingPlayMode]`, the reset again, `[OnCodeUnloading]`. `[OnCodeLoaded]` runs before the engine is ready there: calling `Time.frameCount` from it crashed the player.
 
-The reset is itself registered as a lifecycle callback, so its place among the callbacks on the same transition is an observation, not a documented order.
+Editor startup and a recompile in Edit mode run no reset: it belongs to the Play mode transitions only. The reset is itself registered as a lifecycle callback, so its place among the callbacks on the same transition is an observation, not a documented order.
 
 ## `[AutoStaticsCleanup]` details
 

@@ -35,6 +35,12 @@ This skill covers domain reload. With scene reload also off, scene objects are n
 - **The declaring type is `partial`, always.** A lifecycle callback in a non-`partial` type fails with `UAC0031`; `[AutoStaticsCleanup]` in one fails with `CS0260`.
 - The UAL analyzer (`UAL0010` to `UAL0014`) is off by default and turned on per assembly with a `<asmdefName>.globalconfig`. Leave the analyzer and any `.globalconfig` as the repo has them; mention the analyzer at most once, as an option.
 
+## Which callback for what (6.5 and later)
+
+- **Per-session state**: `[AutoStaticsCleanup]` for a plain reset, `[OnEnteringPlayMode]` for a reset or setup that needs a method call.
+- **Once per code load** (a registry built from types, a reflection cache): `[OnCodeInitializing]`. It runs at Editor startup, after each recompile, on each Play entry with reload on, and at Player startup, but never on a Play entry with reload off, so the setup must be safe to run again and hold across sessions. Use it rather than `[OnCodeLoaded]`, which runs before the engine is ready in a player.
+- **The static that load code fills gets `[NoAutoStaticsCleanup]`.** The `[AutoStaticsCleanup]` reset runs after `[OnCodeInitializing]` on every Play entry, reload on or off, and at Player startup, so a cleaned static filled there is already empty when Play mode code reads it.
+
 ## Static events and singletons
 
 - **Static event**: reset to `null` on entering Play mode (`[AutoStaticsCleanup]` on the event, or the fallback assigning `null`), so last session's subscribers never fire.

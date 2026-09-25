@@ -223,6 +223,14 @@ The six code lifecycle checks from [#22](https://github.com/Hissal/mattpocock-sk
 5. **Event and property**: a static event with one subscriber came back `null`; an auto-property with no initializer came back `null`, one with an initializer came back to it. Also: an `int` with no initializer came back `0`; a field initialized with `new Payload()` got a new instance; a `static readonly List<int>` kept its instance and was emptied.
 6. **Type-level `[AutoStaticsCleanup]` with a field-level `[NoAutoStaticsCleanup]`**: the opt-out wins; that field kept its dirty value across two Play sessions while the type's other statics reset.
 
+Where the reset runs when code loads (6000.6.2f1, #33 review of PR #48). A type-level `[AutoStaticsCleanup]` probe whose `static int Marker` initializer logs, so every evaluation (type init or reset) leaves a line; a `Cache` filled in `[OnCodeInitializing]` under the type-level cleanup, and a `KeptCache` filled there with `[NoAutoStaticsCleanup]`:
+
+- Editor startup and a recompile in Edit mode: `Marker` evaluated once (type init), then `[OnCodeLoaded]`, `[OnCodeInitializing]`, `[InitializeOnLoadMethod]`, `[OnEnteringEditMode]`. No reset.
+- Play entry, reload off: `[OnExitingEditMode]`, `[InitializeOnEnterPlayMode]`, reset, `[OnEnteringPlayMode]`. `Cache` was null from `[OnEnteringPlayMode]` on; `KeptCache` kept its entry.
+- Play entry, reload on (`EnterPlayModeOptions.None`): `[OnExitingEditMode]`, (reload) type init, `[OnCodeLoaded]`, `[InitializeOnEnterPlayMode]`, `[OnCodeInitializing]` (filled both), `[InitializeOnLoadMethod]`, then the reset, then `[OnEnteringPlayMode]` with `Cache` null and `KeptCache` kept. So even with reload on, the reset wipes what `[OnCodeInitializing]` just set up.
+- Exit, either setting: `[OnExitingPlayMode]`, reset, `[OnEnteringEditMode]`.
+- Windows release player: type init, `[OnCodeLoaded]`, `[OnCodeInitializing]` (filled both), reset, `[OnEnteringPlayMode]` with `Cache` null and `KeptCache` kept, then `SubsystemRegistration`, `BeforeSceneLoad`, `Start`; on quit `[OnExitingPlayMode]`, then the reset again.
+
 Also observed: a MonoBehaviour singleton's static instance field after exiting Play mode (reload off) held the destroyed object: `Instance == null` was true, `ReferenceEquals(Instance, null)` and `Instance is null` were false, and `Instance ?? fallback` returned the destroyed object. `UNITY_6000_5_OR_NEWER` is defined on 6000.5.11f1 (seen in the compiler response file), so a dual path can gate on it.
 
 ### Pre-6.5 fallbacks and Enter Play Mode Options history
