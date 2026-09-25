@@ -58,7 +58,18 @@ Two demo prototypes built to the skill in the sandbox (`Assets/_t34/_Prototypes/
 
 The Game view capture command wrote its PNG under `Assets/` (`save_path` resolved against it), which created an asset folder outside the prototype: pass a path outside `Assets/`, or delete what it made.
 
+### Fallback and focus checks (2026-09-25)
+
+Run after the test drive, same editor and settings.
+
+- **No asmdef, every file in `#if UNITY_EDITOR`.** A production class `GameScore` in `Assembly-CSharp` (no asmdef above it), and a prototype subfolder with no asmdef holding a MonoBehaviour and a `[MenuItem]` class that use it, each file wrapped whole in `#if UNITY_EDITOR` (the `using UnityEditor` inside it). The Editor compiled clean; the MonoBehaviour attached and was still there (not a missing script) after saving and reopening its scene; the menu item ran; in Play its `Start` updated `GameScore`. A Windows player build succeeded with 0 errors, and its `Assembly-CSharp.dll` contained the string `GameScore` but neither `FallbackProbe` nor `FallbackMenu`. **Confirmed.**
+- **Focus checks for uGUI, TextMesh Pro and UI Toolkit.** A probe scene with an `EventSystem` using `InputSystemUIInputModule`, a Screen Space Overlay canvas holding a uGUI `InputField` and a `TMP_InputField`, a `UIDocument` whose code adds a `TextField`, and a switcher whose key guard checks each (asmdef referencing `UnityEngine.UI`, `Unity.TextMeshPro` and `Unity.InputSystem` by `GUID:`). Focus was set from code (`EventSystem.SetSelectedGameObject` plus `ActivateInputField()`, and `TextField.Focus()`), and a right-arrow `KeyDown` was sent to the Game view with `EditorWindow.SendEvent`. With no field focused the arrow switched the variant; with each field focused the guard reported it and the switcher logged the arrow as ignored. **Confirmed**, with synthetic key events, not real key presses.
+  - `InputField.isFocused` and `TMP_InputField.isFocused` read `false` right after `ActivateInputField()` and `true` from the next frame.
+  - With a UI Toolkit `TextField` focused, `focusController.focusedElement` was the `TextField` itself, and `EventSystem.currentSelectedGameObject` became the panel's object, so the uGUI checks do not fire for it.
+  - A key event sent with `SendEvent` reached `OnGUI` on a later frame, not during the call.
+  - `Object.FindObjectsByType<T>(FindObjectsSortMode)` compiles with an obsolete warning on 6000.6 ("FindObjectsSortMode has been deprecated"), so the template lists UI Toolkit documents on the switcher instead of finding them.
+- A TextMesh Pro input field needs the TMP Essential Resources in the project (`TMP Settings` under a `Resources` folder); the sandbox had none until they were imported, which adds `Assets/TextMesh Pro/`.
+
 ## Open questions / unverified
 
-- A MonoBehaviour in `Assembly-CSharp` wrapped whole in `#if UNITY_EDITOR`, attached in a prototype scene: attachable in the Editor and harmless because the scene is not in the build, by the same reasoning as check 1, but not run.
 - Whether switching away from a throwaway branch that tracks the prototype files removes them from the working tree when the working branch ignores them was not tried; the removal step deletes whatever is left either way.

@@ -39,7 +39,7 @@ Call `unity-assemblies` to create the asmdef (its GUID rule, a hand-written `.me
 - `defineConstraints: ["UNITY_EDITOR"]`: it compiles only in the Editor and is left out of player builds, while its MonoBehaviours still attach to scene objects. It may use `UnityEditor` (menu items, windows) with no `#if`.
 - Never an Editor-platform asmdef (only the Editor platform included) or an `Editor` folder: Unity refuses to attach a MonoBehaviour from one.
 
-When the code the prototype needs lives in `Assembly-CSharp`, which asmdef code cannot reference, use no asmdef: the files go in the prototype subfolder and each is wrapped whole in `#if UNITY_EDITOR`, which omits it from player builds. This fallback was not run in a sandbox: compile it, and run the menu item, before hand-over.
+When the code the prototype needs lives in `Assembly-CSharp`, which asmdef code cannot reference, use no asmdef: the files go in the prototype subfolder and each is wrapped whole in `#if UNITY_EDITOR`, which omits it from player builds.
 
 The prototype compiles clean before hand-over: a compile error in it fails the whole project's compile, so nothing new runs until it is fixed.
 

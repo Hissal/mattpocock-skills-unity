@@ -75,7 +75,7 @@ namespace Prototypes.<Name>
 
 ## Variant switcher
 
-Put it on a GameObject in the prototype scene and fill `variants` with each variant's root. It draws with IMGUI and reads keys from IMGUI events, which arrive even when Active Input Handling is the Input System only, and skips the arrow keys while an IMGUI text field has keyboard focus. When the prototype has uGUI or UI Toolkit text fields, extend the guard with their focus check (unverified here: the selected input field's `isFocused`, or the panel's focused element being a `TextField`).
+Put it on a GameObject in the prototype scene and fill `variants` with each variant's root. It draws with IMGUI and reads keys from IMGUI events, which arrive even when Active Input Handling is the Input System only, and skips the arrow keys while an IMGUI text field has keyboard focus. When the prototype has uGUI, TextMesh Pro or UI Toolkit text fields, extend the guard (below).
 
 ```csharp
 using UnityEngine;
@@ -117,5 +117,33 @@ namespace Prototypes.<Name>
             if (GUI.Button(new Rect(bar.xMax - 44, bar.y + 4, 40, height - 8), ">")) Step(1);
         }
     }
+}
+```
+
+### Guarding other text fields
+
+When the prototype has uGUI, TextMesh Pro or UI Toolkit text fields, replace `GUIUtility.keyboardControl == 0` in `OnGUI` with `!TextFieldHasFocus()` and add the members below, keeping only the checks for the UI systems the prototype uses. Each needs its assembly referenced from the prototype's asmdef (`UnityEngine.UI`, `Unity.TextMeshPro`), per `unity-assemblies`. UI Toolkit documents are listed on the switcher rather than found, so no find call is needed.
+
+```csharp
+using TMPro;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
+
+// in PrototypeSwitcher:
+public UIDocument[] documents; // UI Toolkit documents whose text fields should keep the arrow keys
+
+bool TextFieldHasFocus()
+{
+    if (GUIUtility.keyboardControl != 0) return true; // IMGUI
+    var selected = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
+    if (selected)
+    {
+        if (selected.TryGetComponent<TMP_InputField>(out var tmp) && tmp.isFocused) return true;
+        if (selected.TryGetComponent<InputField>(out var field) && field.isFocused) return true;
+    }
+    foreach (var doc in documents)
+        if (doc && doc.rootVisualElement?.panel?.focusController?.focusedElement is TextField) return true;
+    return false;
 }
 ```
