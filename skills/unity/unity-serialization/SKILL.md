@@ -7,7 +7,7 @@ description: Unity serialization rules. Use when changing a serialized field, ty
 
 This repo's Unity config (`docs/agents/unity.md`), if present, overrides these defaults.
 
-These rules cover Unity's own serializer. When the config's **Serialization** field names a third-party serializer (Odin and similar), fields that serializer owns follow its rules and the conventions the config points at, not this skill.
+These rules cover Unity's own serializer. When the config's **Serialization** section names a third-party serializer (Odin and similar), fields that serializer owns follow its rules and the conventions the config points at, not this skill.
 
 A rule gated on a Unity version says so. When the gate matters, read the version from `ProjectSettings/ProjectVersion.txt` (a UPM package: the `unity` field of its `package.json`, its minimum).
 

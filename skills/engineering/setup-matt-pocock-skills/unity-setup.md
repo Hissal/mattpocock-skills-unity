@@ -26,6 +26,9 @@ Find each fact without asking. The same detection as the `unity` router: the rep
 | CI workflows | `.github/workflows/`, `.gitlab-ci.yml` and the like, for jobs that run Unity (`game-ci/`, `unity test`, `-runTests`, `-executeMethod`) | Verification: authoritative CI workflow |
 | Test filters | the filters or categories those runners and CI jobs pass (`-testFilter`, `-testCategory`, `-assemblyNames`) | Verification: test filters |
 | Build targets and method or profile | CI build steps (`targetPlatform`, `buildMethod`), build scripts calling `BuildPipeline.BuildPlayer`, Build Profile assets | Verification: build |
+| Assembly naming | the `name` of each existing `.asmdef`, and any naming rule in the conventions docs | Assemblies: naming convention |
+| Project-wide defines | `-define:` lines in a `csc.rsp` under `Assets/`, `scriptingDefineSymbols` in `ProjectSettings/ProjectSettings.asset`, defines in Build Profile assets | Assemblies: project-wide defines |
+| Third-party serializer | a serializer package or plugin folder (Odin: `Assets/Plugins/Sirenix/`, `using Sirenix.Serialization`), and a conventions doc covering it | Serialization: third-party serializer |
 
 No editor version: the Unity skills read `ProjectVersion.txt`, or the package's `unity` field, when a version gate matters.
 
@@ -40,6 +43,8 @@ Present every fact as one list, each with where it came from and whether it will
 The policies, each read from its owning skill so the question states the default that skill really uses:
 
 - `unity-verification`: allowed environments, cold import ok, resident headless ok, heavy-run warning.
+- `unity-assemblies`: layout policy.
+- `unity-code-lifecycle`: reload does not matter, lifecycle API.
 
 Ask exactly one question, listing each policy with its default:
 

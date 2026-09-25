@@ -29,3 +29,24 @@ Owner: `unity-verification`.
 - **Build**: the player build targets, and the build method or build profile.
 - **Authoritative CI workflow**: the workflow file whose result counts as the CI rung.
 - **Heavy-run warning**: whether to ask before a heavy run (a full suite, a PlayMode run or a player build) starts.
+
+## Assemblies
+
+Owner: `unity-assemblies`.
+
+- **Naming convention**: the naming scheme a new assembly follows.
+- **Layout policy**: which asmdef changes (a new asmdef, a split, code moved out of `Assembly-CSharp`) may be made without proposing them first, and where the new asmdefs go.
+- **Project-wide defines**: where this repo keeps project-wide scripting symbols: `csc.rsp`, Player Settings or build profiles.
+
+## Serialization
+
+Owner: `unity-serialization`.
+
+- **Third-party serializer**: a serializer used beside Unity's own (Odin and similar), then the path of this repo's conventions for it.
+
+## Code lifecycle
+
+Owner: `unity-code-lifecycle`.
+
+- **Reload does not matter**: `yes` when statics need not be written as if domain reload is off.
+- **Lifecycle API**: the static reset API that new code with no local precedent uses: the lifecycle attributes and `[AutoStaticsCleanup]`, or the pre-6.5 fallbacks.
