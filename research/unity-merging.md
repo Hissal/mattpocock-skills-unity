@@ -195,3 +195,12 @@ The four checks the `MERGING.md` claims rest on, run for [#40](https://github.co
    - a `.controller` whose `m_State: {fileID: N}` points at a missing anchor: `Broken text PPtr in file(Assets/.../Dangling.controller). Local file identifier (999999) doesn't exist!`
    - broken YAML in an `.anim`: `Unable to parse file Assets/.../Broken.anim: [Parser Failure at line 80: Expected closing '}']`
 4. **Which asset keeps its GUID on a collision.** An imported clip (`ZZZ_Old.anim`) plus a new one (`AAA_New.anim`, sorting first) with a copy of its `.meta`: the log says `GUID [...] for asset 'AAA_New.anim' conflicts with: 'ZZZ_Old.anim' (current owner)` then `Assigning a new guid.`, and `AAA_New.anim.meta` is rewritten on disk with a new GUID. The asset already in the `Library/` keeps the GUID, whatever the name order. Two new clips sharing a fresh GUID: each is reported against the other and **both** get new GUIDs, so neither keeps it.
+
+### Driver checks after fixing the global driver (2026-09-25)
+
+A global driver of `merge -p --force %O %A %B`, with the exe path unquoted and pointing at an uninstalled editor, was replaced by `'<6000.6.2f1 UnityYAMLMerge.exe>' merge -h -p --force --fallback none %O %B %A %A`. Checked in a scratch repo whose `.gitattributes` sends `*.unity` and `*.meta` to the driver (as a real project's does), Git 2.55.0, no repo-local override. All [tool].
+
+- **The old argument form loses data silently.** Run by hand with an installed exe on a scene where each side renamed a different object: with no dest argument the tool prints the merged file to stdout and exits 0, and leaves `%A` untouched. As a driver, Git reads exit 0 as a clean merge and keeps `%A`, our side: their change disappears with no conflict reported.
+- **The fixed driver on scenes**: different objects renamed on each side merge cleanly (`M`, both names); the same object renamed on both sides is `UU` with no markers, holding their value.
+- **The fixed driver on `.meta`**: UnityYAMLMerge cannot parse `.meta` files (`Error parsing file ...: File is not a valid text serialized YAML file. Make sure that Asset Serialization is set to 'Force text' in Editor Settings.`), exit 1, dest untouched, also on a real project's texture `.meta`. So every `.meta` both sides changed is `UU` (an add/add `AA`) with no markers, holding our side, even for changes on different lines. A `.gitattributes` that sends `*.meta` to the driver turns every concurrent `.meta` edit into a conflict; leaving `.meta` to Git's line merge avoids it.
+

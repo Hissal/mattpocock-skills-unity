@@ -25,6 +25,8 @@ Stops are **batched**: resolve everything else first, then one ask listing each 
   - **Command defined and its exe exists**: Smart Merge ran. The file holds its partial merge, with no markers (with `-p`, their side of each conflicted property).
   - **Command defined, exe missing** (a stale editor path): Git marks **every** file with that attribute unmerged, even ones with no overlapping change, and each holds our side untouched with no markers (observed on Git 2.55). Nothing was merged: run Smart Merge by hand on each.
   - **No command**: Git line-merged the file, and it has markers.
+  - **A `.meta` sent to the driver**: UnityYAMLMerge cannot parse `.meta` files (`File is not a valid text serialized YAML file`) and exits 1, so every `.meta` both sides changed is unmerged, holding our side with no markers, even when the changes do not overlap. Line-merge it by hand from the index stages (as in *Smart Merge by hand*): `git merge-file ours base theirs` writes the merge into `ours`, markers included, and exits with the conflict count.
+  - **The command's arguments**: UnityYAMLMerge takes base, theirs, ours, dest, and Git reads only `%A`, so the command ends `%O %B %A %A`. Without a dest the tool prints the merge to stdout and exits 0, and Git records our side as cleanly merged: their changes to that file are gone with no conflict shown. Name it in the final report.
 - **Rebase swaps the sides.** During a rebase, stage 2 (`--ours`) is the branch being rebased onto and stage 3 (`--theirs`) is your commit being replayed. Read which side the file holds before calling it resolved.
 
 ## By file type
@@ -33,7 +35,7 @@ Stops are **batched**: resolve everything else first, then one ask listing each 
 |---|---|
 | `.unity`, `.prefab` | Smart Merge. Its report's property conflicts: resolve property by property, by each side's intent. Structural conflicts: stop. |
 | Other Unity YAML: `.asset`, `.mat`, `.controller`, `.anim`, `ProjectSettings/*.asset` | Smart Merge with `--force` (a merged `.controller` and `.anim` imported and loaded cleanly on 6000.6.2f1), or a line merge. Keep each `{fileID, guid}` pair whole. |
-| `.meta` | Import-setting hunks: resolve as YAML. A `guid:` hunk: grep the tree for both GUIDs; keep the one only one side references, or stop when both are referenced. Resolve an asset and its `.meta` to the same side. |
+| `.meta` | Line merge, never Smart Merge (it cannot parse `.meta`). Import-setting hunks: resolve as YAML. A `guid:` hunk: grep the tree for both GUIDs; keep the one only one side references, or stop when both are referenced. Resolve an asset and its `.meta` to the same side. |
 | Binary, or LFS (`git check-attr filter -- <path>` says `lfs`) | No hunks, only a side: `git checkout --ours\|--theirs -- <asset> <asset>.meta`, then `git add`. Changed on both sides with no rule: stop. The LFS pointer text is never edited. |
 | `Packages/packages-lock.json` | Take either side; the Package Manager regenerates it on the next Editor open. |
 | `.cs`, `.asmdef`, `.asmref`, `Packages/manifest.json`, `.uss`, `.uxml`, `.shader` | Ordinary text. |
