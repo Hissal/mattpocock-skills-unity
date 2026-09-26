@@ -59,7 +59,7 @@ _Avoid_: unverified, untested
 - An **Issue** carries one **Triage role** at a time
 - A **Decision ticket** is an **Issue** (a child of a `wayfinder:map`)
 - An **Upstream skill** reaches Unity knowledge only through the **Unity router**
-- The **Unity router** routes to **Unity skills** for mechanics; it holds no mechanics itself
+- The **Unity router** routes to **Unity skills** for mechanics, and to the Unity docs for API facts no **Unity skill** states; it holds no mechanics itself
 - The **Unity router** and each **Unity skill** read the **Unity config** for repo facts, falling back to generic defaults when it is absent
 
 ## Flagged ambiguities
