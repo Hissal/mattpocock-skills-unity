@@ -1,5 +1,7 @@
 # mattpocock-skills-unity
 
+This fork versions on its own line. For releases of `mattpocock/skills` before the fork, and for what each upstream sync brought in, see [upstream's changelog](https://github.com/mattpocock/skills/blob/main/CHANGELOG.md).
+
 ## 1.0.0
 
 ### Major Changes
@@ -43,8 +45,6 @@
 - [#62](https://github.com/Hissal/mattpocock-skills-unity/pull/62) [`41ba738`](https://github.com/Hissal/mattpocock-skills-unity/commit/41ba7386e992e2354f99b84c49c1047ae1378794) Thanks [@Hissal](https://github.com/Hissal)! - `to-tickets` and `to-spec` gain their Unity deltas: in a Unity repo, `to-tickets` calls the `unity` router for slicing Unity work into tickets (shared scenes or prefabs block each other, editor or human needs, serialized renames as expand then contract), and `to-spec` calls it for sketching a Unity feature's test seams. Each docs page gains one Unity line.
 
 - [#46](https://github.com/Hissal/mattpocock-skills-unity/pull/46) [`c4e9f67`](https://github.com/Hissal/mattpocock-skills-unity/commit/c4e9f67f6073b4a52bbb5e7ca4fb2365c2f23c28) Thanks [@Hissal](https://github.com/Hissal)! - Add the `unity-verification` skill: the Verification ladder (text checks, compile, targeted tests, full EditMode suite, PlayMode, player build, CI) and the rung rule, the environment order (connected editor through `com.unity.pipeline`, then the headless `unity` CLI, then text checks and a hand-off) with its hard rules, how to read Unity results without a false green, running C# in the Editor, and the report shape that names every unvalidated rung. The `unity` router gains its rows and `ask-matt` its line.
-
-This fork versions on its own line. For releases of `mattpocock/skills` before the fork, and for what each upstream sync brought in, see [upstream's changelog](https://github.com/mattpocock/skills/blob/main/CHANGELOG.md).
 
 ## 0.1.0
 
