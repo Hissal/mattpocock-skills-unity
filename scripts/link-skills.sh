@@ -15,6 +15,11 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 DESTS=("$HOME/.claude/skills" "$HOME/.agents/skills")
 
+# Git Bash on Windows: `ln -s` silently copies unless told to make native
+# symlinks. `nativestrict` makes it fail instead (enable Developer Mode or run
+# elevated). Other platforms ignore MSYS.
+export MSYS="winsymlinks:nativestrict${MSYS:+ $MSYS}"
+
 # Collect the repo's skills once, link into every destination. `deprecated/`
 # is retired, and `misc/` is kept around but rarely used and not promoted (see
 # each bucket's own README): neither belongs in a daily-driver skill
@@ -52,7 +57,9 @@ for DEST in "${DESTS[@]}"; do
     src="${srcs[$i]}"
     target="$DEST/$name"
 
-    if [ -e "$target" ] && [ ! -L "$target" ]; then
+    # Replace any existing entry, symlinks included: Git Bash on Windows cannot
+    # overwrite a directory symlink with `ln -sfn` ("Not a directory").
+    if [ -e "$target" ] || [ -L "$target" ]; then
       rm -rf "$target"
     fi
 
