@@ -1,11 +1,11 @@
 ---
 name: unity
-description: Unity knowledge entry point. Use when another skill asks for Unity knowledge, or in a Unity repo when no `unity-*` skill fits the task.
+description: Unity knowledge entry point. Use when another skill asks for Unity knowledge, when looking up the Unity API or Manual docs, or in a Unity repo when no `unity-*` skill fits the task.
 ---
 
 # Unity
 
-The entry point for Unity knowledge. It finds the Unity repo, reads its **Unity config**, and routes the caller's **need** (the moment it reaches for Unity knowledge, such as "how to run the tests") to the Unity skills that answer it. It holds no Unity mechanics: each fact lives in exactly one Unity skill.
+The entry point for Unity knowledge. It finds the Unity repo, reads its **Unity config**, and routes the caller's **need** (the moment it reaches for Unity knowledge, such as "how to run the tests") to the Unity skills that answer it, or to the Unity docs page for the repo's Unity version. It holds no Unity mechanics: each fact lives in exactly one Unity skill or in the docs.
 
 Invoked directly with no stated need, take the task in front of you as the need.
 
@@ -67,6 +67,10 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 
 Rows land with the Unity skill that owns them, so the table names only skills that exist.
 
-## 4. No match
+## 4. Unity docs
 
-When no row fits, return the config facts: the project path(s) and shape, the conventions pointers, and any policy the config sets (or the assumed defaults from step 2). Then name the need, as `No Unity skill covers: <need>.`, so the gap is visible to the caller and the user.
+For an API or Manual fact no Unity skill states, read the docs for the repo's Unity version. `unity docs --url <Class or Class.Member>` (add `--manual <page-slug>` for the Manual) prints the version-matched page URL; fetch that. It reads the version only from the current directory, so run it from the project folder found in step 1, or pass `--editor-version` (a package's version is its `package.json` `unity` field); a URL with no `<major.minor>/` segment missed the version. It never checks the page exists: on a 404, fix the name. An API page is the full type name minus a leading `UnityEngine.` or `UnityEditor.` only (`AssetDatabase`, `SceneManagement.SceneManager`, `Unity.Scripting.LifecycleManagement.AutoStaticsCleanupAttribute`), and a package's types live in its own docs, `https://docs.unity3d.com/Packages/<package>@<major.minor>/` (`manual/` or `api/<full type name>.html`), at the version in `Packages/manifest.json`. Without the CLI (or with one before 1.0.0-beta.11, which lacks `docs`), build the same URL: `https://docs.unity3d.com/<major.minor>/Documentation/ScriptReference/<Class>.html`, or `Manual/<page-slug>.html`.
+
+## 5. No match
+
+When neither a row nor the docs fit, return the config facts: the project path(s) and shape, the conventions pointers, and any policy the config sets (or the assumed defaults from step 2). Then name the need, as `No Unity skill covers: <need>.`, so the gap is visible to the caller and the user.

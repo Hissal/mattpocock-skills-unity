@@ -100,4 +100,4 @@ In a Unity repo the flows above hold as they are: each skill pulls in the Unity 
 - **`/unity-code-lifecycle`**: adding a static, a singleton or a static event, writing code that runs on load, on a code reload, or on entering or exiting Play mode, or a bug that shows up only on the second Play.
 - **`/unity-prototyping`**: prototyping in a Unity repo: whether it belongs in the engine or an HTML page will do, keeping it out of `main` and player builds, running it with a variant switcher, and removing it without breaking anything.
 - **`/unity-debugging`**: a Unity bug you cannot pin down yet: reproducing it in Play mode without you, reading the Editor or Player log, attaching a debugger, or measuring a slowdown.
-- **`/unity`**: a Unity question no line above fits. It finds the Unity project, reads the Unity config, and names any need no Unity skill covers yet.
+- **`/unity`**: a Unity question no line above fits, or a Unity API or Manual page for this repo's Unity version. It finds the Unity project, reads the Unity config, finds the docs page for the repo's Unity version, and names any need no Unity skill covers yet.
