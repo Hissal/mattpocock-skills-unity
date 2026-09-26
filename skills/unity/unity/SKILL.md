@@ -1,6 +1,6 @@
 ---
 name: unity
-description: Unity knowledge entry point. Use when another skill asks for Unity knowledge, or in a Unity repo when no `unity-*` skill fits the task.
+description: Unity knowledge entry point. Use when another skill asks for Unity knowledge, when looking up the Unity API or Manual docs, or in a Unity repo when no `unity-*` skill fits the task.
 ---
 
 # Unity
@@ -69,4 +69,8 @@ Rows land with the Unity skill that owns them, so the table names only skills th
 
 ## 4. No match
 
-When no row fits, return the config facts: the project path(s) and shape, the conventions pointers, and any policy the config sets (or the assumed defaults from step 2). Then name the need, as `No Unity skill covers: <need>.`, so the gap is visible to the caller and the user.
+When no row fits and the need is not a docs lookup (step 5), return the config facts: the project path(s) and shape, the conventions pointers, and any policy the config sets (or the assumed defaults from step 2). Then name the need, as `No Unity skill covers: <need>.`, so the gap is visible to the caller and the user.
+
+## 5. Unity docs
+
+For an API or Manual fact no Unity skill states, read the docs for the repo's Unity version, not the latest. `unity docs --url <Class or Class.Member>` (add `--manual <page-slug>` for the Manual) prints the version-matched page URL; fetch that. It reads the version only from the current directory, so run it from the project folder found in step 1, or pass `--editor-version` (a package's version is its `package.json` `unity` field). It never checks the page exists: on a 404, fix the name. An API page is the full type name minus a leading `UnityEngine.` or `UnityEditor.` only (`AssetDatabase`, `SceneManagement.SceneManager`, `Unity.Scripting.LifecycleManagement.AutoStaticsCleanupAttribute`), and a package's types live in that package's docs instead. Without the CLI, build the same URL: `https://docs.unity3d.com/<major.minor>/Documentation/ScriptReference/<Class>.html`, or `Manual/<page-slug>.html`.

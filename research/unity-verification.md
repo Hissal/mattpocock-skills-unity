@@ -40,7 +40,7 @@ Reading logs: grep for `error CS\d{4}` and `Scripts have compiler errors` rather
 
 ## 2. Official Unity CLI (`unity` binary)
 
-Status: announced 2026-07-20 as beta (<https://unity.com/blog/meet-the-unity-cli>); docs.unity.com labels it experimental (<https://docs.unity.com/en-us/unity-cli>, updated September 2026). Latest release 1.0.0-beta.10 on 2026-09-14 (<https://docs.unity.com/en-us/unity-cli/release-notes>). Single self-contained binary for macOS, Linux, Windows; the CLI is free and separate from Unity AI (<https://docs.unity.com/en-us/unity-cli/replace-mcp-server-unity-cli>).
+Status: announced 2026-07-20 as beta (<https://unity.com/blog/meet-the-unity-cli>); docs.unity.com labels it experimental (<https://docs.unity.com/en-us/unity-cli>, updated September 2026). Latest release 1.0.0-beta.11 on 2026-09-14, after 1.0.0-beta.10 on 2026-09-08 (<https://docs.unity.com/en-us/unity-cli/release-notes>, read 2026-09-26). Single self-contained binary for macOS, Linux, Windows; the CLI is free and separate from Unity AI (<https://docs.unity.com/en-us/unity-cli/replace-mcp-server-unity-cli>).
 
 **`unity skill show` works and is the best self-documentation.** Observed with 1.0.0-beta.9: `unity skill show` prints the embedded `SKILL.md`, `--list` lists its files (`SKILL.md`, `CHANGELOG.md`, `SECURITY.md`, 8 `references/*.md`), and `--path references/<file>.md` prints one. It writes nothing and needs no network. The same tree is published at <https://github.com/Unity-Technologies/skills/tree/main/skills/unity-cli>, which can lag the binary. A skill should tell the agent to run `unity skill show` rather than vendor a copy.
 
@@ -53,6 +53,14 @@ Verification-relevant commands (all from the embedded skill, 1.0.0-beta.9, `refe
 - Global: `--format json` envelopes with `success` and `errors[0].code`; exit codes 0/1/2 (bad args)/3 (auth)/4 (precondition, for example no licence)/6/8. SKILL.md: <https://github.com/Unity-Technologies/skills/blob/main/skills/unity-cli/SKILL.md>
 
 Project lock through the CLI: `unity test` and `unity build` documentation does not say what happens when a GUI editor already holds the project. **Observed** for `unity test` (section 11, check 1): it refuses in about 3 s with exit 6 and does not reuse the open editor. `unity build` is still **unverified**; expect the same refusal.
+
+**`unity docs` (new in 1.0.0-beta.11): version-matched docs URLs.** The release notes say it opens the documentation for a class or topic "matched to your project's Unity version"; `--manual` switches from the Scripting API to the Manual, `--editor-version <v>` overrides the version, `--search` opens the search results, and `--url` prints the URL instead of opening a browser (`unity docs --help`, 1.0.0-beta.11). **Observed** on 2026-09-26 (CLI 1.0.0-beta.11, `unity-sandbox/` on 6000.6.2f1, Windows 11), with each URL's status read by `curl -L`:
+
+- It only builds a URL: `https://docs.unity3d.com/<major.minor>/Documentation/ScriptReference/<topic>.html`, or `Manual/<topic>.html` with `--manual`. It fetches nothing, so the agent still reads the page with its own fetch. Without `--url` it opens the user's browser, which an agent never wants.
+- The version comes from `ProjectSettings/ProjectVersion.txt` in the **current directory only**: run from `unity-sandbox/` it gave `6000.6/`; run from `unity-sandbox/Assets/` or from a non-project folder it silently gave the unversioned URL (`/Documentation/...`, the latest docs) and `"version": null` under `--json`. `--editor-version` accepts both `6000.6.2f1` and `6000.0` and trims to major.minor; `2021.3` and `2022.3` URLs also resolved (200).
+- No existence check: `NoSuchClassXyz` and `--manual NoSuchPageXyz` both print a URL, which 404s. The page name is the full type name minus a leading `UnityEngine.` or `UnityEditor.` only: `UnityEditor.AssetDatabase.ForceReserializeAssets.html` 404s while `AssetDatabase.ForceReserializeAssets.html` is 200; `SceneManager.html` 404s while `SceneManagement.SceneManager.html` is 200; `AutoStaticsCleanupAttribute.html` 404s while `Unity.Scripting.LifecycleManagement.AutoStaticsCleanupAttribute.html` is 200. A package type such as the Test Framework's `TestTools.UnityTest` has no ScriptReference page (404). Manual topics are the page's file slug (`domain-reloading`, `Coroutines`), not a title.
+- The `--search` URL (`ScriptReference/30_search.html?q=...`) returns 200 but its results render client-side: the fetched HTML holds no match for the query. Useful to a human in a browser, useless to an agent's fetch.
+- Package docs (`docs.unity3d.com/Packages/<package>@<version>/...`) are out of its reach.
 
 ## 3. Compile-only paths (Roslyn against generated csproj)
 
