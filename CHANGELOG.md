@@ -2,6 +2,16 @@
 
 This fork versions on its own line. For releases of `mattpocock/skills` before the fork, and for what each upstream sync brought in, see [upstream's changelog](https://github.com/mattpocock/skills/blob/main/CHANGELOG.md).
 
+## 1.0.1
+
+### Patch Changes
+
+- [#82](https://github.com/Hissal/mattpocock-skills-unity/pull/82) [`8382c6f`](https://github.com/Hissal/mattpocock-skills-unity/commit/8382c6f088b777601ffb02c3cb959d2cf18c637a) Thanks [@Hissal](https://github.com/Hissal)! - `unity-debugging`: the Play loop script's domain-reload wait no longer polls `editor_status`. It pauses 1 s, then checks that the AppDomain mark is gone, since on Pipeline 0.8 the CLI waits through the reload by itself once the reload has started, and a command sent at once fails with a 400. The research records the checks.
+
+- [#77](https://github.com/Hissal/mattpocock-skills-unity/pull/77) [`aaf5acb`](https://github.com/Hissal/mattpocock-skills-unity/commit/aaf5acb5cff98658a985d3e2300fba7cc382b31c) Thanks [@Hissal](https://github.com/Hissal)! - `unity-debugging`: an unfocused GUI editor stalls Play because `runInBackground` is off, not because of focus. The Play loop script now turns `Application.runInBackground` on before every Play and restores the user's value on every exit, so unfocused runs go in real time; stepping frames is a fallback for when frames still do not advance. The skill points at Unity's Play-mode verification loop recipe, and the research records the checks.
+
+- [#80](https://github.com/Hissal/mattpocock-skills-unity/pull/80) [`df8b8ea`](https://github.com/Hissal/mattpocock-skills-unity/commit/df8b8ea741ceda1044065a3e12a62cf9d7aba910) Thanks [@Hissal](https://github.com/Hissal)! - `unity-verification`: editor detection reads `unity status`'s `errors[0].code` rather than its exit code, and waits with `unity status --until-ready`. A new pending-editor section covers `STATUS_PIPELINE_LOAD_PENDING`, including Assets > Refresh when Auto Refresh is off. Safe Mode is recognised by a pending state a refresh does not clear plus the project log or window title, not by `unity pipeline list`, and the editor leaves it after a fix and a refresh, with no restart. The exit-code table's 6 and 7 rows match. `unity-verification` and `unity-debugging` both point to `unity commands --grep` for CLI syntax. The research is re-pinned to CLI 1.0.0-beta.12 with the checks behind these changes.
+
 ## 1.0.0
 
 ### Major Changes
