@@ -13,7 +13,7 @@ How to merge `mattpocock/skills` (remote `upstream`) into this fork. Sync on dem
    - `CHANGELOG.md`: keep ours. The fork's changelog only lists fork releases.
    - The `version` field in `package.json` and `.claude-plugin/plugin.json`: keep ours. Take upstream's other edits to those files.
    - `package-lock.json`: never hand-merge. Take either side, then run `npm install` to regenerate it.
-   - Every other conflict: resolve with the `resolving-merge-conflicts` skill, keeping each Unity delta.
+   - Every other conflict: trace each side to its intent (upstream's commit or PR, the fork delta's adapt ticket and `research/` file) and keep both where they fit. Keep each Unity delta, re-applying it onto upstream's new text when upstream rewrote the file. A Unity asset or `.meta` conflict follows `unity-serialization`.
 4. Check the Unity deltas survived: `git diff upstream/main -- skills/ docs/` must show only the fork's intended Unity changes. A delta that vanished, or an upstream change that reads as a fork change, is a bad resolution. The reasoning behind each delta lives in its adapt ticket and in `research/`.
 5. If upstream added, renamed, or removed a skill: place it in the right bucket per `CLAUDE.md`, re-read `ask-matt`'s `SKILL.md` so its map stays accurate, and run `scripts/link-skills.sh`.
 6. Run `claude plugin validate . --strict` and `npm run check-plugin-version`.
