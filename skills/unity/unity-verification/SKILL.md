@@ -7,7 +7,7 @@ description: Unity verification rules. Use when checking that a Unity change com
 
 This repo's Unity config (`docs/agents/unity.md`), if present, overrides these defaults.
 
-This skill decides which check runs, where, and how to read its result. What to test is `unity-testing`'s call; this skill runs it. For `unity` CLI syntax, run `unity skill show` and `unity <command> --help`: the CLI is beta and moves every few weeks, so the commands named in this skill mark the traps, and their current form comes from the CLI.
+This skill decides which check runs, where, and how to read its result. What to test is `unity-testing`'s call; this skill runs it. For `unity` CLI syntax, search with `unity commands --grep <term>` first, then run `unity skill show` and `unity <command> --help`: the CLI is beta and moves every few weeks, so the commands named in this skill mark the traps, and their current form comes from the CLI.
 
 ## The Verification ladder
 
@@ -29,7 +29,7 @@ This skill decides which check runs, where, and how to read its result. What to 
 
 ## Where Unity runs
 
-Take the first environment available, in this order. [ENVIRONMENTS.md](ENVIRONMENTS.md) has detection, the capability table and the Safe Mode deadlock.
+Take the first environment available, in this order. [ENVIRONMENTS.md](ENVIRONMENTS.md) has detection, the capability table, a pending editor and Safe Mode.
 
 1. **Connected editor**: an open editor with `com.unity.pipeline`, driven through `unity recompile` and `unity command --project-path <project>`. Fastest, and it holds the project lock, so it is the only route while the user's editor is open. Unity MCP is deprecated in favour of this CLI route; use it only where the CLI cannot run.
 2. **Headless**: `unity test`, `unity build`, `unity run`, when an editor is installed, no editor holds the project, the Unity config's allowed environments permit launching one, and a licence is available.
