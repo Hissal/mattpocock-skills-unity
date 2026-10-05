@@ -2,6 +2,26 @@
 
 This fork versions on its own line. For releases of `mattpocock/skills` before the fork, and for what each upstream sync brought in, see [upstream's changelog](https://github.com/mattpocock/skills/blob/main/CHANGELOG.md).
 
+## 1.1.0
+
+### Minor Changes
+
+- Merge upstream `mattpocock/skills` from `c55ee46` through `4588b32` (v1.3.0, v1.3.1 and later); see [upstream's CHANGELOG](https://github.com/mattpocock/skills/blob/main/CHANGELOG.md) for what changed. A minor bump, not a patch, because the sync removes a skill and renames a convention:
+
+  - `resolving-merge-conflicts` is removed, as upstream removed it, along with its Unity delta. Unity asset conflicts still route to `unity-serialization`.
+  - The domain glossary is now `GLOSSARY.md` (or `GLOSSARY-MAP.md`), not `CONTEXT.md`. Rename yours to keep the skills reading it.
+  - `pr`, `retro` and `implement-spec` graduate to `engineering/` and ship in the plugin.
+
+### Patch Changes
+
+- [#92](https://github.com/Hissal/mattpocock-skills-unity/pull/92) [`8df3702`](https://github.com/Hissal/mattpocock-skills-unity/commit/8df3702e3004bea4e6563524175ece02cb13f95d) Thanks [@Hissal](https://github.com/Hissal)! - `implement-spec`: in a Unity repo it now asks the `unity` router how to set up implementers' parallel worktrees, which `unity-verification`'s new-checkout rule answers, and how to verify the integration branch before marking it ready or reporting it, naming what stayed unvalidated. The `unity` router gains a row for running work in parallel worktrees, routed to `unity-verification`.
+
+- [#93](https://github.com/Hissal/mattpocock-skills-unity/pull/93) [`b95a313`](https://github.com/Hissal/mattpocock-skills-unity/commit/b95a313b16885fe7c0b77ab1fb3693dd034234e8) Thanks [@Hissal](https://github.com/Hissal)! - `pr`: in a Unity repo it now asks the `unity` router how to capture the Game or Scene view and how to read Unity test results for its Evidence section. The router gains a row for each: capture goes to `unity-debugging` (capture fails headless) and the Unity CLI's own skill, read with `unity skill show` and searched with `unity skill show --list`, and test results go to `unity-verification`. The glossary's Unity router entry now names the CLI's skill as a route.
+
+- [#94](https://github.com/Hissal/mattpocock-skills-unity/pull/94) [`c3c4e83`](https://github.com/Hissal/mattpocock-skills-unity/commit/c3c4e83b7439ea1f0da6c8ece6284a4108fe965c) Thanks [@Hissal](https://github.com/Hissal)! - `retro`: in a Unity repo it now asks the `unity` router for Unity environment gaps in the session: checks it left unvalidated and why, a missing Unity config, no test assembly or asmdefs, or an open editor without `com.unity.pipeline`. The router gains a row for that need, routed to `unity-verification`, `unity-testing` and `unity-assemblies`; a missing Unity config is already reported by the router itself.
+
+- [#91](https://github.com/Hissal/mattpocock-skills-unity/pull/91) [`b25b97c`](https://github.com/Hissal/mattpocock-skills-unity/commit/b25b97c4d58d3ceb6164230e5acc98104740f224) Thanks [@Hissal](https://github.com/Hissal)! - `unity-verification`: a new checkout or worktree now gets its `Library/` copied from a warm checkout of the same project by default, with a fast multithreaded copy, and the copy drops the source editor's instance files when an editor holds it. Without a warm checkout, a run that creates several worktrees asks once for all of them and runs their cold imports one at a time, since concurrent cold imports ran out of memory in the sandbox checks. `unity-debugging`'s bisection row points at the copy. The research records the checks.
+
 ## 1.0.1
 
 ### Patch Changes
