@@ -19,11 +19,12 @@ A connected editor verifies its in-memory state, which can differ from disk (uns
 ## Detecting the environment
 
 1. **Is an editor connected?** `unity status --format json` lists every editor running Pipeline, GUI or resident headless, with its project path and `state`. Every failure exits 6, so tell them apart by `errors[0].code`:
-   - `STATUS_NO_INSTANCES`: no editor holds the project, or the CLI could not locate it (run from the project folder or pass `--project-path`).
+   - `STATUS_NO_INSTANCES`: no editor with Pipeline found for the project, or the CLI could not locate it (run from the project folder or pass `--project-path`). It cannot see an editor without Pipeline, so an editor may still hold the project.
    - `STATUS_PIPELINE_LOAD_PENDING`: an editor holds the project with Pipeline in its manifest, but nothing is serving. It is still opening or importing, it needs a refresh to load a newly added package (see [Pending editor](#pending-editor)), or it is in [Safe Mode](#safe-mode).
    - `STATUS_NOT_READY`: still starting.
+   - `STATUS_ALL_UNREACHABLE`: every editor found is unreachable, such as one with a stale heartbeat.
 
-   To wait for an editor to come up, run `unity status --until-ready --timeout <seconds>`; on timeout it exits 6 with the last state it saw. It cannot see an editor without Pipeline, so it is a positive signal only: an editor may still hold the project.
+   To wait for an editor to come up, run `unity status --until-ready --timeout <seconds>`; on timeout it exits 6 with the last state it saw.
 2. **Is the project locked?** `unity test` against a project an editor holds refuses in seconds with exit 6 and "already open in a running Editor (PID n)", and changes nothing (other headless commands are expected, not confirmed, to refuse the same way). That refusal is the lock check: drive the open editor instead (install Pipeline if it lacks it) or hand off.
 3. **Can an editor launch here?** `unity` on PATH, the project's editor version installed (`ProjectSettings/ProjectVersion.txt`), the Unity config's allowed environments permitting it, and an active licence (`unity license` lists them). Any missing piece is an environment gap: text checks and hand-off.
 
@@ -35,7 +36,7 @@ An editor open on the project without `com.unity.pipeline` forces a hand-off for
 
 ## Pending editor
 
-`STATUS_PIPELINE_LOAD_PENDING` that persists after the editor has finished opening (typically after `unity pipeline install` into an editor that was already open) means the editor has not loaded the package. Ask the user to switch to the editor. If they have Auto Refresh off (Preferences > Asset Pipeline), focus is not enough: they need Assets > Refresh (Ctrl+R). Then re-run `unity status --until-ready`. A pending state that a refresh does not clear is Safe Mode.
+`STATUS_PIPELINE_LOAD_PENDING` that persists after the editor has finished opening (typically after `unity pipeline install` into an editor that was already open) means the editor has not loaded the package. Ask the user to switch to the editor. If they have Auto Refresh off (Preferences > Asset Pipeline), focus is not enough: they need Assets > Refresh (Ctrl+R). Then re-run `unity status --until-ready`. If a refresh does not clear it, check for Safe Mode.
 
 ## Safe Mode
 
