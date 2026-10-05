@@ -242,3 +242,19 @@ Unity's CLI skill says the same (`unity skill show --path references/playmode-ve
 - **An unfocused editor needs a resolve after the upgrade.** `unity pipeline upgrade` changed `Packages/manifest.json`, but the editor kept 0.7 loaded until `UnityEditor.PackageManager.Client.Resolve()`, sent through `eval`, made it resolve.
 
 Later the same day, during #74's implementation, the sandbox moved to 0.8.0-exp.1 for good: upgraded with `unity pipeline upgrade` while the editor was closed, it loaded 0.8 on the next open with no resolve step, compiled clean and passed the EditMode smoke test.
+
+### 2026-10-05: the domain-reload wait without `editor_status` ([#81](https://github.com/Hissal/mattpocock-skills-unity/issues/81))
+
+**Observed** in the #81 triage on 2026-10-05: GUI editor 6000.6.2f1, `com.unity.pipeline` 0.8.0-exp.1, unity CLI 1.0.0-beta.12, domain and scene reload off. Each probe marked the AppDomain and called `EditorUtility.RequestScriptReload()` through `eval`, then sent a command.
+
+| Probe | Result |
+|---|---|
+| Any command (`eval` or `editor_status`) sent at once after the reload request | Fails after about 5 s: `COMMAND_FAILED`, "Pipeline server returned 400 Bad Request", CLI exit 6, in 4 of 5 and then 6 of 6. The CLI does not retry it |
+| The same command sent 1 s after the reload request | The CLI waits through the reload and runs it in the fresh domain (mark gone, `domainReloadInProgress: false`), 6 of 6 |
+| The script's wait as it was (sleep 1 s, poll `editor_status`, then the mark check) | Settled in 9.2 to 11.5 s, 1 try in 4 of 5 runs, 2 in 1 |
+| The same wait without the `editor_status` poll | Settled in 7.8 to 8.1 s, 1 try in 5 of 5 |
+| The mark check alone, no pause, retried every 0.2 s | Settled, but the first try usually hit the 400: 6.3 to 9.3 s |
+
+On Pipeline 0.7 an `eval` sent at once waited 6.4 s and ran in the fresh domain ([unity-verification.md](./unity-verification.md) section 12). On 0.8 the same race shows up as a 400 on a command that reaches the server as the reload starts, not as a command run in the old domain. So `play-loop.sh` drops the `editor_status` poll, since the CLI's own wait (`--timeout`, default 30 s) covers the reload once the 1 s pause has passed. It keeps the pause, so the first try does not hit the 400; it keeps ignoring a failed mark check, in case one still does; and it keeps the mark, since nothing else tells the old domain from the fresh one.
+
+**Play loop script without the poll: confirmed** (same day and versions, with a probe in `Assets/_t81/`, removed afterwards, that set `Done` after 60 frames and, when a marker file existed, logged the symptom only while a static set on the first Play was still false). With the bug on and the static already set by earlier Plays, it exited 3 (red, then green) in 3 of 3 runs, about 25 s each, so run 1 started from a fresh domain. With the bug off it exited 0 in 2 of 2. The wait alone settled in 6.8 to 7.7 s on 1 try in 4 of 5 runs, and in 12.4 s on 2 tries in the fifth.
