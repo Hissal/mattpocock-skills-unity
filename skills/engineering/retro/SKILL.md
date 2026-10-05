@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 The user has asked for a **retrospective**. You are suggesting improvements to the coding agent's **environment** to improve future runs.
 
+In a Unity repo, call the Skill tool with "unity" for finding Unity environment gaps the session hit: parts of the change left **Unvalidated** and the **Verification ladder** rung each skipped, with why; a missing Unity config; no test assembly or asmdefs; or an open editor without `com.unity.pipeline`.
+
 ## Steps
 
 1. Call the Skill tool with `writing-for-agents` for the writing style guide.
