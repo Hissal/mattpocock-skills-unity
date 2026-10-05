@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 The user has asked for a **retrospective**. You are suggesting improvements to the coding agent's **environment** to improve future runs.
 
+In a Unity repo, call the Skill tool with "unity" for finding Unity environment gaps the session hit: parts of the change left **Unvalidated** and the **Verification ladder** rung each skipped, with why; a missing Unity config; no test assembly or asmdefs; or an open editor without `com.unity.pipeline`.
+
 ## Steps
 
 1. Call the Skill tool with `writing-for-agents` for the writing style guide.
@@ -21,8 +23,6 @@ The user has asked for a **retrospective**. You are suggesting improvements to t
 - **Tool economy**: did the agent make expensive tool calls that could be streamlined? Is there any custom tooling (CLI's, MCP's) that is particularly token-inefficient? _Use when_ the agent made an expensive tool call.
 - **No-ops**: look for instructions in steering files that don't modify the agent's behavior. _Use when_ the steering files are large and unwieldy.
 - **Information access**: look for opportunities to increase the agent's access to information. Teeing dev server logs, readonly access to third-party services. _Use when_ a crucial piece of information was not available to the agent.
-
-In a Unity repo, call the Skill tool with "unity" for finding Unity environment gaps in the session: rungs of the **Verification ladder** it left **Unvalidated** and why, a missing Unity config, no test assembly or asmdefs, or an open editor without `com.unity.pipeline`.
 
 4. Present these candidates to the user, in order of severity.
 

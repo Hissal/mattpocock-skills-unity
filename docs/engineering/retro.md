@@ -4,7 +4,7 @@
 
 It changes the environment, not the code. Take the bug the agent shipped, the file it needed twenty [tool calls](https://www.aihero.dev/ai-coding-dictionary/tool-call) to find, or the rule the reviewer missed. `retro` does not fix any of them directly. It asks what in the repo let them happen, and proposes the check, pointer, or standard that prevents them next time. It also only proposes. Nothing changes until you pick a candidate.
 
-In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router for the Unity environment gaps the session hit: checks it left unvalidated and why, a missing Unity config, no test assembly, or an open editor without the Pipeline package.
+In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router for the Unity environment gaps the session hit: checks it left unvalidated and why, a missing Unity config, no test assembly or asmdefs, or an open editor without the Pipeline package.
 
 ## When to reach for it
 

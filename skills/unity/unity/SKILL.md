@@ -41,7 +41,7 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | running work in parallel worktrees | unity-verification |
 | capturing the Game or Scene view | unity-debugging, the Unity CLI's own skill |
 | reading Unity test results | unity-verification |
-| finding Unity environment gaps in a session: unvalidated rungs, no Unity config, no test assembly or asmdefs, an editor without Pipeline | unity-verification, unity-testing |
+| finding Unity environment gaps a session hit | unity-verification, unity-testing, unity-assemblies |
 | writing or changing a test | unity-testing |
 | setting up tests where none exist | unity-testing |
 | choosing which tests cover a change, or sketching test seams for a feature | unity-testing |
