@@ -52,11 +52,11 @@ u eval --code 'return UnityEditor.EditorSettings.enterPlayModeOptionsEnabled && 
 if $reload_off; then
   # Statics survive between Play sessions: reload the domain so the first run is a true first Play.
   # The reload is asynchronous: mark the current domain, then wait until a fresh one has no mark.
+  # A command sent as the reload starts can fail; one sent a second later waits it out in the CLI.
   u eval --code 'System.AppDomain.CurrentDomain.SetData("play-loop", true); UnityEditor.EditorUtility.RequestScriptReload(); return 0;' >/dev/null
   settled=false
   for _ in $(seq 1 60); do
     sleep 1
-    u editor_status 2>/dev/null | grep -q '"domainReloadInProgress": *false' || continue
     u eval --code 'return System.AppDomain.CurrentDomain.GetData("play-loop") == null;' 2>/dev/null | is_true && { settled=true; break; }
   done
   $settled || { echo "no verdict: the domain reload did not finish" >&2; exit 2; }

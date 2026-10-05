@@ -197,7 +197,7 @@ Checks behind [#72](https://github.com/Hissal/mattpocock-skills-unity/issues/72)
 | Fix the compile error, then Assets > Refresh | The **same** editor process left Safe Mode with no restart; `--until-ready` returned `ready` in 11 s |
 | `editor_play`, then `unity command editor_status` immediately | Both succeeded, no `EDITOR_NOT_READY` |
 | `RequestScriptReload` through `eval`, then `unity status` polled for 18 s | `ready` at every poll: `status` does not see a script reload |
-| `RequestScriptReload`, then an `eval` sent at once | The CLI waited 6.4 s and ran it in the fresh domain |
+| `RequestScriptReload`, then an `eval` sent at once | The CLI waited 6.4 s and ran it in the fresh domain. **0.7 only**: on 0.8.0-exp.1 a command sent at once usually fails with a 400, and one sent 1 s later waits ([unity-debugging.md](./unity-debugging.md) section 7, [#81](https://github.com/Hissal/mattpocock-skills-unity/issues/81)) |
 | `unity projects create ... --with-pipeline` | Exit 0 in 117 s; the manifest gets `com.unity.pipeline` 0.8.0-exp.1 (the latest, which is what a bare `unity pipeline install` installs too) |
 | `unity skill show --list` | 11 `references/*.md` files, including `playmode-verification-loop.md` |
 | `unity commands --help` | `--grep <pattern>` searches command names, descriptions and options, plus the plugin catalog |
