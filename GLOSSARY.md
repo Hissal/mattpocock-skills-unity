@@ -39,7 +39,7 @@ A skill under `skills/unity/` that teaches one area of Unity mechanics (serializ
 _Avoid_: Unity primitive, Unity module
 
 **Unity router**:
-The `unity` skill: the one entry point **Upstream skills** call for Unity knowledge. It routes to the right **Unity skill** and to the repo's **Unity config**.
+The `unity` skill: the one entry point **Upstream skills** call for Unity knowledge. It routes to the right **Unity skill**, the Unity CLI's own skill, or the Unity docs, and reads the repo's **Unity config**.
 
 **Unity config**:
 `docs/agents/unity.md` in a consuming repo, written by setup: this repo's Unity facts and policies where they differ from the Unity skills' defaults, and pointers to where its own Unity conventions live. Never a copy of those conventions.
@@ -59,7 +59,7 @@ _Avoid_: unverified, untested
 - An **Issue** carries one **Triage role** at a time
 - A **Decision ticket** is an **Issue** (a child of a `wayfinder:map`)
 - An **Upstream skill** reaches Unity knowledge only through the **Unity router**
-- The **Unity router** routes to **Unity skills** for mechanics, and to the Unity docs for API facts no **Unity skill** states; it holds no mechanics itself
+- The **Unity router** routes to **Unity skills** for mechanics, to the Unity CLI's own skill (read with `unity skill show`) for driving the CLI, and to the Unity docs for API facts no **Unity skill** states; it holds no mechanics itself
 - The **Unity router** and each **Unity skill** read the **Unity config** for repo facts, falling back to generic defaults when it is absent
 
 ## Flagged ambiguities

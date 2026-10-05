@@ -19,7 +19,7 @@ Type `/pr`, or the agent reaches for it automatically whenever it is writing a P
 Three sections, in this order:
 
 - **Summary**: one or more small visuals, each placed next to the short text it supports. Use one, sometimes several, rarely all of them. Keep only the calls, files, props, and boundaries the reviewer needs.
-- **Evidence**: a before and after. A screenshot is the strongest evidence when the change is visual and the [environment](https://www.aihero.dev/ai-coding-dictionary/environment) can take one. Otherwise, use the exact test that failed and now passes, written as pseudocode, or the console output that changed.
+- **Evidence**: a before and after. A screenshot is the strongest evidence when the change is visual and the [environment](https://www.aihero.dev/ai-coding-dictionary/environment) can take one. Otherwise, use the exact test that failed and now passes, written as pseudocode, or the console output that changed. In a Unity repo, the agent asks the `unity` skill how to capture the Game or Scene view and how to read Unity test results.
 - **Merge Danger**: whether the change is a **one-way door** or a **two-way door**, and its **blast radius**. A two-way door is cheap to reverse; a one-way door (a destructive migration, a public API removal, a hard-to-reverse decision) is not. Blast radius names what could break if the change is wrong: layout shift, consumers of an API, mobile responsiveness.
 
 The door call is the leading idea. It changes "is this safe to merge?" from a gut feeling into a stated claim the reviewer can disagree with. It also tells them where to spend their [human review](https://www.aihero.dev/ai-coding-dictionary/human-review). Skim a two-way door with a small blast radius, and read a one-way door slowly.
