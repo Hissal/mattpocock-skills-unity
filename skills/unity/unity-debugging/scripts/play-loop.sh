@@ -8,6 +8,7 @@ DONE='ReproProbe.Done'                         # a static C# bool that turns tru
 SYMPTOM='\[DEBUG-a4f2\] health went negative'  # grep -E pattern for the symptom in the console
 TIMEOUT_S=30                                   # wait budget when frames run in real time
 MAX_FRAMES=600                                 # step budget when they do not
+STALL_S=5                                      # how long frames may stay still before stepping (the first Play after a reload took 1.5 s)
 
 u() { unity command --project-path "$PROJECT" "$@" --result-only; }
 num() { grep -o "\"$1\": *[0-9]*" | head -1 | grep -o '[0-9]*$'; }
@@ -17,12 +18,12 @@ run_once() {
   local cursor wait console timeout="$TIMEOUT_S" n=0
   cursor=$(u console_status | num cursor)
   [ -n "$cursor" ] || { echo "no verdict: console_status gave no cursor" >&2; return 2; }
-  # An unfocused GUI editor stalls Play unless runInBackground is on. Set it every run: once on, it sticks until a restart.
+  # An unfocused GUI editor stalls Play unless runInBackground is on.
+  # Set it every run: once on, it sticks until a restart.
   u eval --code 'UnityEngine.Application.runInBackground = true; return 0;' >/dev/null || return 2
   u editor_play >/dev/null || return 2
   # Fallback: frames still do not advance, so pause and step them instead.
-  # The budget is 5 s: the first frame after the domain reload below took about 1.5 s.
-  if ! u wait_for --condition '{"member":"UnityEngine.Time.frameCount","op":"changed"}' --timeout_s 5 | grep -q '"met": *true'; then
+  if ! u wait_for --condition '{"member":"UnityEngine.Time.frameCount","op":"changed"}' --timeout_s "$STALL_S" | grep -q '"met": *true'; then
     echo "frames do not advance: stepping them" >&2
     u editor_pause >/dev/null
     while [ "$n" -lt "$MAX_FRAMES" ] && ! u eval --code "for (int i = 0; i < 30; i++) { if ($DONE) break; UnityEditor.EditorApplication.Step(); } return $DONE;" | is_true; do
@@ -41,9 +42,9 @@ run_once() {
 }
 
 # Restore the user's runInBackground on every exit path (in the Editor it is the Player Settings value).
-rib=$(u eval --code 'return UnityEditor.PlayerSettings.runInBackground;' | grep -o '"result": *[a-z]*' | grep -o '[a-z]*$')
-case "$rib" in true|false) ;; *) echo "no verdict: could not read runInBackground" >&2; exit 2 ;; esac
-trap 'u editor_stop >/dev/null 2>&1; u eval --code "UnityEditor.PlayerSettings.runInBackground = $rib; return 0;" >/dev/null' EXIT
+user_rib=$(u eval --code 'return UnityEditor.PlayerSettings.runInBackground;' | grep -o '"result": *[a-z]*' | grep -o '[a-z]*$')
+case "$user_rib" in true|false) ;; *) echo "no verdict: could not read runInBackground" >&2; exit 2 ;; esac
+trap 'u editor_stop >/dev/null 2>&1; u eval --code "UnityEditor.PlayerSettings.runInBackground = $user_rib; return 0;" >/dev/null' EXIT
 trap 'exit 2' INT TERM
 
 reload_off=false
