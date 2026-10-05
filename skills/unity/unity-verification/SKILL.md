@@ -45,7 +45,10 @@ An open editor without Pipeline gets one mention per conversation that `unity pi
 
 **Resident headless editor** (batch mode without `-quit`, serving Pipeline commands): only when the Unity config allows it. Otherwise each headless check is one CLI launch. When you start one, name it in the report and stop it when done; ask before stopping one you did not start.
 
-**Cold import**: before the first run in a checkout with no `Library/`, ask the user once (a full import can take many minutes), unless the Unity config says cold imports are fine. Each checkout keeps its own `Library/`, never a shared one.
+**Cold import**: a checkout with no `Library/` needs a full import before its first run. Each checkout keeps its own `Library/`, never a shared or linked one.
+
+- **Warm copy**, the default when another checkout of the same project has a `Library/`: copy it into the new checkout before Unity first opens it. Use a multithreaded copy (`robocopy <src> <dst> /E /MT:16` on Windows), since a plain `cp -r` can take longer than the import it saves. If an editor holds the source checkout, delete `EditorInstance.json` and `ProtocolInstance.json` from the copied `Library/`, or the CLI refuses the copy as already open. The first run then recompiles scripts once and reimports only what differs between the two commits.
+- **No warm checkout**: ask the user once before the first run (a full import can take many minutes), unless the Unity config says cold imports are fine. A run that creates several worktrees asks once for all of them and runs their cold imports one at a time, since concurrent cold imports can exhaust memory and crash the editor. Warm runs in separate checkouts can run side by side on one licence.
 
 ## Reading results
 

@@ -122,7 +122,7 @@ Two official routes, one of them now deprecated.
 - GameCI: caching `Library` with `actions/cache` "could speed up your build by more than 50%" (same claim for test runs). <https://game.ci/docs/github/builder>, <https://game.ci/docs/github/test-runner> (v4). GameCI also warns not to delete `Library` for licensing failures, and to clear only `Library/PackageCache` or `Library/Bee` for specific errors. <https://game.ci/docs/troubleshooting/common-issues/>
 - Unity Accelerator is a caching proxy for import results shared across a team; enabled on the command line with `-EnableCacheServer -cacheServerEndpoint host:port`. <https://docs.unity3d.com/6000.0/Documentation/Manual/UnityAccelerator.html>, command-line page (6000.0). No published hit-rate figures.
 - No Unity page gives absolute import times; they depend on project size and asset types. The example repository below measured one project; treat those as an order of magnitude only.
-- Consequence for the ladder: the first real compile in a fresh checkout, worktree or cloud container costs a full import. A skill should weigh that cost explicitly and prefer a warmed checkout or a live editor, and the per-repo config should record whether a warmed checkout exists.
+- Consequence for the ladder: the first real compile in a fresh checkout, worktree or cloud container costs a full import. A skill should weigh that cost explicitly and prefer a warmed checkout or a live editor, and the per-repo config should record whether a warmed checkout exists. Section 13 measures filling a new worktree by copying a warm `Library/` instead.
 
 ## 9. What each agent environment can do
 
@@ -209,6 +209,32 @@ Sources and notes:
 - Changelog only, not observed: `unity recompile` now exits 6 instead of 7 when the editor rejects an argument with an error whose text starts "Cannot connect to Unity Editor Pipeline server at".
 - The release notes also add `frameCount` and `playerLoopTicking` to `unity status` rows in Play mode, when the package reports them. Pipeline 0.8.0-exp.1 does not ([unity-debugging.md](./unity-debugging.md) section 7).
 - Opening an editor on a changed manifest (from the #74 checks, 2026-10-05, Pipeline 0.8.0-exp.1): after `unity pipeline upgrade` with the editor **closed**, `unity open .` then `unity status --until-ready --timeout 300` reached `ready` with the new version loaded and no refresh. The long pending state above came from installing into an editor that was **already open**.
+
+## 13. Sandbox checks for several worktrees at once
+
+Checks behind [#86](https://github.com/Hissal/mattpocock-skills-unity/issues/86). All **observed** on 2026-10-05 with editor 6000.6.2f1, `com.unity.pipeline` 0.8.0-exp.1, CLI 1.0.0-beta.12, a Unity Personal licence, on one Windows 11 machine with 16 logical cores and 15 GB of RAM. Two GUI editors stayed open on other projects throughout. `unity-sandbox/` was itself open in one of them, so its sources (`Assets/`, `Packages/`, `ProjectSettings/`) were committed to a throwaway git repo, and every worktree below is a worktree of that repo. Each run is `unity test <worktree> --mode EditMode` on the sandbox's one-test suite. Import counts are from the `InitialRefreshV2` summary in the worktree's `Logs/Editor.log`.
+
+**Check 1: a copied `Library/`.**
+
+| Run | Wall clock | Imports | Script compile |
+|---|---|---|---|
+| Cold import, no `Library/` | 155 s | 3757 | 48 s |
+| Same checkout, run again (warm in place) | 33 s | 0 | 2 s |
+| Fresh worktree at the **same commit**, `Library/` copied from the warm one | 99 s | 0 | 35 s |
+| Fresh worktree at a **different commit** (one new script, one changed `.asset`), `Library/` copied | 97 s | 2: the new folder and the changed asset | 62 s |
+| Fresh worktree, `Library/` copied from `unity-sandbox/` **while its GUI editor held it**, two instance files deleted (below) | 71 s | 1 (an asset that differed between the two) | 45 s |
+
+- A copied `Library/` is valid and warm: no "Rebuilding Library" line, no full reimport, test green. Unity reimports only the assets that differ between the two commits.
+- The first run in the copy recompiles every script once: the log reads "Rebuilding DAG because FileSignature timestamp changed: Library/Bee/...-inputdata.json". That recompile, not any import, is the gap between 33 s and 99 s.
+- **Copy speed decides whether copying pays.** The 1.8 GB, roughly 29 000-file `Library/` took **314 s** with Git Bash `cp -r`, slower than the cold import, and **17 s** with `robocopy /E /MT:16`. `robocopy` copied the 33 000-file `Library/` of the open sandbox in 29 s with no failed files.
+- **A copy taken from a checkout an open editor holds carries that editor's instance files.** `Library/EditorInstance.json` (it holds the editor's `process_id`) and `Library/ProtocolInstance.json` exist only while an editor has the project open. `unity test` on the copy refused in 3 s, exit 6: "already open in a running Editor (PID 2332)", the sandbox editor's PID. With those two files deleted, the copy ran warm (last table row).
+
+**Check 2: concurrent batch editors.**
+
+- Two warm `unity test` runs on two worktrees, started together: both exit 0, green, 32 s and 27 s. Both editors talked to the same licensing client process; no licence error. One Personal licence covered two batch and two GUI editors on one machine at once.
+- Two cold imports at once: **3 of 4 editors crashed** across two attempts. In the first attempt, under the long scratchpad path, one exited with code 1073741845 after "out of memory while parsing" in the shader compiler and "Failed to launch UnityShaderCompiler.exe", while the other passed in 282 s, against 155 s alone. In the second attempt, under a short path, about 3.8 GB of RAM was free at the start. Both reached the end of the import (270 s each) and then exited 6, with "out of memory during compilation" in the shader compiler and, in one, "The file ... 'unity editor resources' is corrupted!". A single warm run straight after passed, so the install was not damaged.
+- So the cap on concurrent cold imports is the machine's memory, not the licence. On this machine it is one. Warm runs are light enough to run side by side.
+- Path length: under the roughly 130-character scratchpad path, a cold import logged up to 138 `DirectoryNotFoundException`s for files deep in `Library/PackageCache` and still went green. Under a short path it logged none. A long worktree path on Windows is a separate risk, not measured further.
 
 ## Real-world example (not generic guidance)
 
