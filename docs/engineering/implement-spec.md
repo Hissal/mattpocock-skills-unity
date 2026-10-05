@@ -4,6 +4,8 @@
 
 It reads the tickets as a **task graph**, not a list. Blocking edges decide what can start, so at any moment there is a **frontier** of tickets whose blockers have all landed, and every ticket on the frontier runs at once. That is the difference from working the tickets one by one. The graph's shape sets the pace, not the tickets' order on the tracker.
 
+In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router how to give each implementer's worktree a Unity `Library/` without a full import per worktree, and how to verify the integration branch before marking it ready or reporting it, ending with a report of which checks ran and which stayed unvalidated.
+
 ## When to reach for it
 
 You invoke this by typing `/implement-spec`, and the agent won't reach for it on its own.

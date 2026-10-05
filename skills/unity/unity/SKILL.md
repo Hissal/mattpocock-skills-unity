@@ -38,6 +38,7 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | building a player | unity-verification |
 | running C# in the Editor | unity-verification |
 | Unity cannot run here, or the editor is locked | unity-verification |
+| running work in parallel worktrees | unity-verification |
 | writing or changing a test | unity-testing |
 | setting up tests where none exist | unity-testing |
 | choosing which tests cover a change, or sketching test seams for a feature | unity-testing |
