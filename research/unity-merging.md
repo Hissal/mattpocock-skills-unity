@@ -1,6 +1,6 @@
 # Research: merging Unity assets
 
-Ticket: [#6](https://github.com/Hissal/mattpocock-skills-unity/issues/6), part of #1. Feeds the Unity delta of the `resolving-merge-conflicts` skill.
+Ticket: [#6](https://github.com/Hissal/mattpocock-skills-unity/issues/6), part of #1. Feeds `unity-serialization`'s `MERGING.md`. It first fed the Unity delta of the `resolving-merge-conflicts` skill, removed with upstream's v1.3.0 ([#76](https://github.com/Hissal/mattpocock-skills-unity/issues/76)).
 
 Versions checked: Unity manual 6000.3 (6.3 LTS), cross-checked against 6000.0 and 2022.3 where noted; UnityYAMLMerge shipped with Editor 6000.3.20f1 (its `mergespecfile.txt` and `mergerules.txt` are byte-identical in 6000.5.11f1 and 6000.7.0b1); Git 2.55 docs on git-scm.com; Git LFS 3.7.1 locally, docs from `main` (3.8.0).
 
