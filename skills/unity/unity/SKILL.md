@@ -5,7 +5,7 @@ description: Unity knowledge entry point. Use when another skill asks for Unity 
 
 # Unity
 
-The entry point for Unity knowledge. It finds the Unity repo, reads its **Unity config**, and routes the caller's **need** (the moment it reaches for Unity knowledge, such as "how to run the tests") to the Unity skills that answer it, or to the Unity docs page for the repo's Unity version. It holds no Unity mechanics: each fact lives in exactly one Unity skill or in the docs.
+The entry point for Unity knowledge. It finds the Unity repo, reads its **Unity config**, and routes the caller's **need** (the moment it reaches for Unity knowledge, such as "how to run the tests") to the Unity skills that answer it, to the Unity CLI's own skill, or to the Unity docs page for the repo's Unity version. It holds no Unity mechanics: each fact lives in exactly one Unity skill, the Unity CLI's own skill, or the docs.
 
 Invoked directly with no stated need, take the task in front of you as the need.
 
@@ -29,9 +29,9 @@ No config: carry on with defaults. State in one line which repo facts you assume
 
 ## 3. Route
 
-Match the need against the needs table. Every row whose need fits is a match. Call the Skill tool once for each distinct Unity skill named across the matched rows, in first-listed order: a skill two rows name is still one call.
+Match the need against the needs table. Every row whose need fits is a match. Call the Skill tool once for each distinct Unity skill named across the matched rows, in first-listed order: a skill two rows name is still one call. The Unity CLI's own skill is not a Skill tool call: read it with `unity skill show`, and find the reference the need wants with `unity skill show --list`, then print it with `unity skill show --path <file>`.
 
-| Need | Unity skills |
+| Need | Routes to |
 |---|---|
 | running the tests, or how often to | unity-testing, unity-verification |
 | checking a change compiles or works before calling it done | unity-verification |
@@ -39,6 +39,8 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | running C# in the Editor | unity-verification |
 | Unity cannot run here, or the editor is locked | unity-verification |
 | running work in parallel worktrees | unity-verification |
+| capturing the Game or Scene view | unity-debugging, the Unity CLI's own skill |
+| reading Unity test results | unity-verification |
 | writing or changing a test | unity-testing |
 | setting up tests where none exist | unity-testing |
 | choosing which tests cover a change, or sketching test seams for a feature | unity-testing |
@@ -66,7 +68,7 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | where a prototype lives, how it runs and is removed, and whether an HTML one fits | unity-prototyping |
 | scanning Unity code for architectural friction | unity-testing, unity-assemblies, unity-code-lifecycle, unity-serialization |
 
-Rows land with the Unity skill that owns them, so the table names only skills that exist.
+Rows land with the Unity skill that owns them, so the table names only skills that exist; the Unity CLI's own skill exists wherever the `unity` CLI does.
 
 ## 4. Unity docs
 
