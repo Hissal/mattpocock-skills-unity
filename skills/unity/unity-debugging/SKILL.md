@@ -20,7 +20,7 @@ The usual ten ways to build a feedback loop, in their Unity form. Same order, sa
 | 5 Replay a captured trace | A captured save, input or data file replayed through `run_script` |
 | 6 Throwaway harness | `run_script` (no import, no domain reload), else `-executeMethod` |
 | 7 Fuzz | A loop inside one EditMode test |
-| 8 Bisection | `unity test` per commit. Warn first: every step reimports what changed and recompiles, so each can take minutes, and a fresh checkout or worktree starts from a cold `Library/` unless you copy a warm one in (`unity-verification`, Cold import) |
+| 8 Bisection | `unity test` per commit. Warn first: every step reimports what changed and recompiles, so each can take minutes, and a fresh checkout or worktree starts from a cold `Library/` unless you copy a warm one in (`unity-verification`, New checkout) |
 | 9 Differential | Editor vs Development player, domain reload on vs off, Mono vs IL2CPP |
 | 10 Human in the loop | Only for input, feel, visuals or a device (below) |
 
