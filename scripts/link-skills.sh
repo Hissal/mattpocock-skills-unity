@@ -52,6 +52,21 @@ for DEST in "${DESTS[@]}"; do
 
   mkdir -p "$DEST"
 
+  # Prune links into this repo whose skill was removed or renamed (the target
+  # is gone) or moved into `deprecated/` or `misc/`. Anything not pointing into
+  # this repo is left alone.
+  for target in "$DEST"/*; do
+    [ -L "$target" ] || continue
+    points_to="$(readlink "$target")"
+    case "$points_to" in
+      "$REPO"/skills/deprecated/*|"$REPO"/skills/misc/*) ;;
+      "$REPO"/*) [ -e "$points_to" ] && continue ;;
+      *) continue ;;
+    esac
+    rm -f "$target"
+    echo "pruned $(basename "$target") -> $points_to ($DEST)"
+  done
+
   for i in "${!names[@]}"; do
     name="${names[$i]}"
     src="${srcs[$i]}"
