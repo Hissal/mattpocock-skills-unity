@@ -7,7 +7,7 @@ description: Unity debugging mechanics. Use when reproducing a Unity bug, drivin
 
 This repo's Unity config (`docs/agents/unity.md`), if present, overrides these defaults, including its **Verification** fields (allowed environments, resident headless ok) and its **Prototype folder** field.
 
-This skill holds the Unity mechanics of a debugging loop: driving and observing Play mode, the REPL, logs, players and measurement. The debugging discipline stays with the workflow that called it. It owns driving Play mode through a connected editor for any caller. Running C# in the Editor (`run_script`, `eval`, `-executeMethod`) and building a player belong to `unity-verification`; call it through the Skill tool for those. Command names below come from Pipeline's live catalog (`unity command --project-path <project> --query <name>` lists current parameters); for `unity` CLI syntax, run `unity skill show`.
+This skill holds the Unity mechanics of a debugging loop: driving and observing Play mode, the REPL, logs, players and measurement. The debugging discipline stays with the workflow that called it. It owns driving Play mode through a connected editor for any caller. Running C# in the Editor (`run_script`, `eval`, `-executeMethod`) and building a player belong to `unity-verification`; call it through the Skill tool for those. Command names below come from Pipeline's live catalog (`unity command --project-path <project> --query <name>` lists current parameters); for `unity` CLI syntax, search with `unity commands --grep <term>` first, then run `unity skill show`.
 
 ## Loop kinds in Unity
 

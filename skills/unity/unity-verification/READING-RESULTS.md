@@ -11,11 +11,11 @@ A green needs three things: the compile finished clean, the run names a nonzero 
 | 2 | Bad arguments |
 | 3 | Authentication |
 | 4 | Precondition failed, for example no licence: an environment gap |
-| 6 | No verdict: compile error, locked project, licence unavailable, crash or timeout. Also `unity status` finding no editor |
-| 7 | No Pipeline instance for the project (a connected command with no editor to answer it) |
+| 6 | No verdict: compile error, locked project, licence unavailable, crash or timeout. Also every `unity status` failure: read `errors[0].code` ([ENVIRONMENTS.md](ENVIRONMENTS.md)) |
+| 7 | No Pipeline instance for the project: a connected command with no editor to answer it, or an editor in Safe Mode |
 | 8 | `unity test`: tests ran and at least one failed |
 
-Codes 1 to 4 are as the CLI documents them; 0, 6, 7 and 8 were observed.
+Codes 1 to 4 are as the CLI documents them; 0, 6, 7 and 8 were observed. One exception per the CLI's release notes, not observed: `unity recompile` exits 6, not 7, when the editor rejects an argument with an error whose text starts "Cannot connect to Unity Editor Pipeline server at".
 
 Exit 6 is not a code failure until the output says why. A compile error names `Scripts have compiler errors`; a locked project names the running editor's PID; a licence that could not be acquired is an environment gap. A `[license]` error line on its own (such as "Access token is unavailable") also shows on runs that went on to succeed or fail for other reasons, so it proves nothing by itself.
 
