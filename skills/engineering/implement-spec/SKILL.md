@@ -16,6 +16,8 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 **Implementer subagents** should be run in the background where possible for maximum concurrency.
 
+In a Unity repo, call the Skill tool with "unity" for running work in parallel worktrees, and for checking the integration branch compiles or works before marking it ready or reporting it, naming in that report what stayed **Unvalidated**.
+
 ## Steps
 
 1. Read the spec and tickets to understand the task graph.
