@@ -40,7 +40,8 @@ One command that goes red on the bug: copy [scripts/play-loop.sh](scripts/play-l
 
 Traps the script already handles, and when to reach past it:
 
-- **An unfocused GUI editor stalls Play at frame 1**, even with `set_autotick` on. The script then pauses and steps frames (`EditorApplication.Step()` in one `eval`, which advances exactly that many frames). Stepped frames suit logic bugs, not timing, feel or `ProfilerRecorder` numbers: for those, ask the user to focus the Unity window for the run.
+- **An unfocused GUI editor can stall Play at frame 1 while `runInBackground` is off**; `set_autotick` does not fix that, `Application.runInBackground = true` does. The script sets it before every Play (once on, it sticks until the editor restarts, so an earlier run that ticked proves nothing) and restores the user's value on exit. Unity's Play-mode verification loop recipe covers the same switches: `unity skill show --path references/playmode-verification-loop.md`.
+- **Stepping is the fallback**: when `Time.frameCount` still does not change within 5 s of `editor_play`, the script pauses and steps frames (`EditorApplication.Step()` in one `eval`, which advances exactly that many frames). Stepped frames suit logic bugs, not timing, feel or `ProfilerRecorder` numbers: only when the script had to step, ask the user to focus the Unity window for those.
 - **`wait_for` polls** every `poll_interval_ms` (100 by default), not every frame: `equals` on a per-frame counter can skip past its value. Use `greaterThan` or `changed`, or `poll_interval_ms 0`.
 - **A synchronous `wait_for` holds the command queue.** When the condition depends on another command, pass `async=true` and poll `wait_status`.
 - **An exception in `Update` does not stop Play**: read the console, not Play state.
