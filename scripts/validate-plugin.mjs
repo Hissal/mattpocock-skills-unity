@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 // Runs `claude plugin validate .` and fails on any error or warning, like
-// `--strict`, except the one warning about CLAUDE.md at the plugin root.
-// That CLAUDE.md is contributor context for this repo, not plugin context:
-// the plugin never meant to ship it, and the manifest has no field to exclude
-// a file, so the warning is expected. Upstream's root shares the same file.
+// `--strict`, except the warnings about CLAUDE.md and CLAUDE.local.md at the
+// plugin root. That CLAUDE.md is contributor context for this repo, not plugin
+// context: the plugin never meant to ship it, and the manifest has no field to
+// exclude a file, so the warning is expected. Upstream's root shares the same
+// file. CLAUDE.local.md is a contributor's gitignored local instructions file:
+// it exists only on their machine, never in CI or the plugin, so its warning
+// is expected too.
 
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
-const EXPECTED = /^CLAUDE\.md at the plugin root is not loaded as project context\./;
+const EXPECTED = /^CLAUDE(\.local)?\.md at the plugin root is not loaded as project context\./;
 
 const run = spawnSync("claude plugin validate . --json", {
   cwd: repo,
@@ -40,4 +43,4 @@ if (problems.length > 0 || !report.success) {
   console.error(problems.join("\n") || "Validation failed.");
   process.exit(1);
 }
-console.log("Plugin validation passed (strict, ignoring the root CLAUDE.md warning).");
+console.log("Plugin validation passed (strict, ignoring the root CLAUDE.md and CLAUDE.local.md warnings).");
