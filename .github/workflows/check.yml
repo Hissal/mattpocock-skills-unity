@@ -1,0 +1,30 @@
+name: Check
+
+on:
+  pull_request:
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      # `claude plugin validate` needs no auth, so validate-plugin runs here too.
+      # Pinned so a new CLI release cannot fail every PR with no repo change.
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code@2.1.289
+
+      - name: Check
+        run: npm run check
