@@ -10,6 +10,8 @@ unity projects create unity-sandbox --path . --editor-version <latest installed>
 
 Run `npm run check` before opening a PR; CI runs it on every pull request. It enforces the mechanical rules below, and `scripts/check.mjs` lists them.
 
+Writing a Unity delta: follow [CODING_STANDARDS.md](./CODING_STANDARDS.md).
+
 Skills are organized into bucket folders under `skills/`:
 
 - `engineering/`: daily code work
