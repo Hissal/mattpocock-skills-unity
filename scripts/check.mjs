@@ -2,7 +2,7 @@
 // Enforces the mechanical CLAUDE.md rules, then runs `check-plugin-version`
 // and `validate-plugin`. Prints one line per violation, naming the file and
 // the rule, and exits 1 on any. Skips `validate-plugin` when the `claude` CLI
-// is not on PATH, since CI may not have it.
+// is not on PATH, so the rest still runs on a machine without it.
 
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PROMOTED = ["engineering", "productivity", "unity"];
-const DOCUMENTED = ["engineering", "productivity"];
+const NEEDS_DOCS_PAGE = ["engineering", "productivity"];
 const EM_DASH = String.fromCharCode(0x2014);
 
 const violations = [];
@@ -19,11 +19,16 @@ const fail = (file, rule) => violations.push(`${file}: ${rule}`);
 
 // Tracked files plus untracked ones not ignored, so a new skill is checked
 // before it is staged. Files deleted from the working tree are dropped.
-const files = spawnSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], {
+const ls = spawnSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], {
   cwd: repo,
   encoding: "utf8",
-})
-  .stdout.split("\0")
+});
+if (ls.status !== 0) {
+  console.error(ls.stderr || "`git ls-files` failed.");
+  process.exit(1);
+}
+const files = ls.stdout
+  .split("\0")
   .filter((f) => f && existsSync(join(repo, f)));
 
 const read = (file) => readFileSync(join(repo, file), "utf8");
@@ -65,7 +70,7 @@ for (const { bucket, name } of skills) {
     if (!bucketReadmes[bucket].includes(`](./${name}/SKILL.md)`)) {
       fail(bucketReadme, `promoted skill ${name} not linked to its SKILL.md`);
     }
-    if (DOCUMENTED.includes(bucket) && !existsSync(join(repo, "docs", bucket, `${name}.md`))) {
+    if (NEEDS_DOCS_PAGE.includes(bucket) && !existsSync(join(repo, "docs", bucket, `${name}.md`))) {
       fail(`docs/${bucket}/${name}.md`, `missing docs page for ${path}`);
     }
   } else {
@@ -82,10 +87,10 @@ console.log(failed ? `\n${violations.length} rule violation(s).` : "Repo rules p
 
 const run = (cmd) => spawnSync(cmd, { cwd: repo, stdio: "inherit", shell: true }).status === 0;
 
-if (!run("node scripts/sync-plugin-version.mjs --check")) failed = true;
+if (!run("npm run check-plugin-version")) failed = true;
 
 const hasClaude = spawnSync("claude --version", { cwd: repo, stdio: "ignore", shell: true }).status === 0;
 if (!hasClaude) console.log("validate-plugin skipped: claude CLI not found, run locally");
-else if (!run("node scripts/validate-plugin.mjs")) failed = true;
+else if (!run("npm run validate-plugin")) failed = true;
 
 process.exit(failed ? 1 : 0);

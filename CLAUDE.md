@@ -8,7 +8,7 @@ Check a Unity mechanic hands-on in `unity-sandbox/` before a skill states it as 
 unity projects create unity-sandbox --path . --editor-version <latest installed> --template com.unity.template.urp-blank --no-cloud --with-pipeline
 ```
 
-Run `npm run check` before opening a PR, and CI runs it on every pull request: it fails on the mechanical rules below (em-dashes, changesets not named `unity-*.md`, promoted skills missing from a README, `plugin.json` or a docs page, non-promoted skills listed) and runs `check-plugin-version` and `validate-plugin`.
+Run `npm run check` before opening a PR; CI runs it on every pull request. It enforces the mechanical rules below, and `scripts/check.mjs` lists them.
 
 Skills are organized into bucket folders under `skills/`:
 
