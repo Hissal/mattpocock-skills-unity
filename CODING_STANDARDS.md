@@ -7,11 +7,11 @@ Judgement rules for a **Unity delta** (see `GLOSSARY.md`) and the files around i
 
 ## The delta line
 
-A Unity delta that reaches Unity knowledge is one line in the upstream skill, in this shape:
+A Unity delta that reaches Unity knowledge is one sentence in the upstream skill, as its own line or a bullet in an upstream list, in this shape:
 
 > In a Unity repo, call the Skill tool with "unity" for <need phrase>.
 
-The need phrase may run to a short list ("for X, and for Y"), and a colon may follow it with what the skill does with the answer.
+The need phrase may run to a short list ("for X, and for Y"), and a colon may follow it with what the skill does with the answer. A skill that briefs a sub-agent hands the same call on: it tells the sub-agent to call the Skill tool with "unity" for <need phrase>.
 
 ## The need phrase
 
@@ -19,9 +19,9 @@ The `unity` router routes by its needs table (`| Need | Routes to |` in [skills/
 
 | Delta | Row | |
 |---|---|---|
-| "how often to run the tests and checks" | "running the tests, or how often to" | close: same need, prose form |
-| "where a prototype lives, how it runs and is removed" | "where a prototype lives, how it runs and is removed, and whether an HTML one fits" | close: same words |
-| "keeping the scan fast in Unity" | "keeping asset churn out of a hotspot scan" | loose: a different need the router cannot match |
+| "how often to run the tests and checks" (`implement`) | "running the tests, or how often to" | close: same need, prose form |
+| "building a feedback loop for a Unity bug, instrumenting or profiling it" (`diagnosing-bugs`) | "reproducing a Unity bug or building a feedback loop for it, instrumenting or profiling it, ..." | close: the delta names part of a wider row |
+| "keeping the scan fast in Unity" (hypothetical) | "keeping asset churn out of a hotspot scan" | loose: a different need the router cannot match |
 
 A delta whose need has no row gets a new row in the same change.
 
@@ -31,4 +31,4 @@ A row stays as short as its neighbours in the table: it names the need, never th
 
 ## One home per rule
 
-Each list or rule has one home. A router row, docs page, changeset or research file that needs it points at that home instead of restating it, so a change is a one-place edit. Restating a delta's list in its router row, or a skill's rule in its changeset, is the drift this rule exists to stop.
+Each list or rule has one home; a router row, docs page, changeset or research file that needs it points there instead of restating it.
