@@ -46,6 +46,8 @@ State transitions: an unlabeled issue normally goes to `needs-triage` first; fro
 
 ## Invocation
 
+In a Unity repo, call the Skill tool with "unity" for classifying Unity involvement for issue triage or selection.
+
 The maintainer invokes `/triage` and describes what they want in natural language. Interpret the request and act. Examples:
 
 - "Show me anything that needs my attention"

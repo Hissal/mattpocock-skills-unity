@@ -30,6 +30,12 @@ Owner: `unity-verification`.
 - **Authoritative CI workflow**: the workflow file whose result counts as the CI rung.
 - **Heavy-run warning**: whether to ask before a heavy run (a full suite, a PlayMode run or a player build) starts.
 
+## Issue classification
+
+Owner: `unity-verification`. The meanings and defaults live in that skill's [ISSUE-CLASSIFICATION.md](../../unity/unity-verification/ISSUE-CLASSIFICATION.md).
+
+- **Unity involvement**: `disabled`, or the adopted convention for reading and updating the issue's Unity involvement. For default labels, write `labels: unity:none, unity:headless, unity:interactive`; for another representation, use a Markdown mapping or a pointer to its canonical rules and any classifier command. An explicit `disabled` overrides a discovered convention.
+
 ## Testing
 
 Owner: `unity-testing`.

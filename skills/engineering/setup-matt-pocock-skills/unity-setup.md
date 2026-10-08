@@ -21,6 +21,7 @@ Find each fact without asking. The same detection as the `unity` router: the rep
 |---|---|---|
 | Project path(s) and shape | the detection above: a project, a package, or both | Project |
 | Unity conventions docs | `AGENTS.md` / `CLAUDE.md` sections and task tables, `docs/`, `CONTRIBUTING.md`, READMEs inside the project folder. Prefer one existing index (a task table that already routes to the docs) over listing every doc | Conventions |
+| Existing Unity involvement classification | issue label taxonomy, tracker config and issue triage/selection conventions; read the canonical meanings and how values are detected and updated | Issue classification: Unity involvement |
 | `com.unity.pipeline` | `Packages/manifest.json` of each project | shown, not written: `unity-verification` reads the manifest itself |
 | Check runners | scripts that run the repo's text checks, compile or Unity tests (`Tools/`, `scripts/`, `package.json` scripts, a `Makefile`), and the ladder rung each performs | Verification: rung commands |
 | CI workflows | `.github/workflows/`, `.gitlab-ci.yml` and the like, for jobs that run Unity (`game-ci/`, `unity test`, `-runTests`, `-executeMethod`) | Verification: authoritative CI workflow |
@@ -58,7 +59,11 @@ With an existing config, a policy it already sets is listed with that value inst
 
 On **yes**, write no policy beyond those. Only on **no**, ask which to change, then take each of those one at a time. A policy the user sets back to its default is not written.
 
-## 4. Ask the prototype folder, always
+## 4. Offer Unity involvement classification
+
+Read `unity-verification`'s [ISSUE-CLASSIFICATION.md](../../unity/unity-verification/ISSUE-CLASSIFICATION.md). Preserve an existing config choice. When a repo already uses the convention, propose a pointer to its canonical rules rather than duplicate labels or definitions; surface conflicting meanings for resolution. Otherwise offer adoption through the default labels or a disabled choice. On adoption, record how to read and update the levels in the **Unity involvement** field, using Markdown rules or pointers to existing conventions. Include any required tracker label creation in the draft and follow the tracker config when the user confirms it. Disabled with no existing convention is the default, so it needs no field; write explicit `disabled` when overriding an existing convention.
+
+## 5. Ask the prototype folder, always
 
 Ask this even when every other default is kept, as its own question. List each discovered candidate with its git behaviour and what that means for a prototype inside it:
 
@@ -75,12 +80,12 @@ An existing folder is used as it is, with no git question. Only a folder setup c
 
 Before writing, check the result with `git check-ignore -v` on a path inside the folder and on its `.meta`. The **Prototype folder** field is written only when the choice is not the default `Assets/_Prototypes/`.
 
-## 5. Draft, confirm, write
+## 6. Draft, confirm, write
 
 Draft `docs/agents/unity.md` from the seed: keep its title and header, then each section that has at least one value, holding only the field lines with values. Drop the owner lines, the placeholder meanings and every empty field and section. Show the draft with the rest of setup's step 3, alongside the `### Unity` sub-block, and let the user edit before writing.
 
 **Re-running**: update the file in place. Change only field lines whose value changed, add new ones, and remove ones now equal to the default. Every other line (a note, a field this procedure does not know, anything hand-written) stays where it is, word for word.
 
-## 6. Done
+## 7. Done
 
 Add to setup's closing message: the `unity` router and the Unity skills now read `docs/agents/unity.md`, it can be edited by hand, and re-running setup after a skills update picks up any new Unity fields.

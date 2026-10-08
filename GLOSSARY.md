@@ -49,6 +49,12 @@ _Avoid_: unity setup, discovery
 The ordered checks a **Unity repo** change can get, cheapest first: text checks, compile, targeted tests, full EditMode suite, PlayMode, player build, CI. A change is verified up to the highest rung it passed.
 _Avoid_: check pipeline, validation steps
 
+**Unity involvement**:
+The minimum Unity involvement required to complete an **Issue**, including its required verification: none, headless execution, or interactive use. A required visual check counts as interactive use.
+
+**Human involvement**:
+The human participation required to complete an **Issue**, including judgment and verification. It is independent of **Unity involvement**: an agent may complete some interactive Unity work.
+
 **Unvalidated**:
 A change, or the part of one, that needed a rung of the **Verification ladder** that did not run. Always reported with the reason the rung was skipped.
 _Avoid_: unverified, untested
