@@ -2,6 +2,16 @@
 
 This fork versions on its own line. For releases of `mattpocock/skills` before the fork, and for what each upstream sync brought in, see [upstream's changelog](https://github.com/mattpocock/skills/blob/main/CHANGELOG.md).
 
+## 1.2.0
+
+### Minor Changes
+
+- [#104](https://github.com/Hissal/mattpocock-skills-unity/pull/104) [`bf68c95`](https://github.com/Hissal/mattpocock-skills-unity/commit/bf68c95b15f1357f72babbe383e7e630c7616045) Thanks [@Hissal](https://github.com/Hissal)! - Add optional Unity involvement classification for issue creation, triage and selection. Setup reuses repo conventions or offers label-based adoption; Unity requirements stay separate from readiness and human involvement.
+
+### Patch Changes
+
+- [#105](https://github.com/Hissal/mattpocock-skills-unity/pull/105) [`3d926c6`](https://github.com/Hissal/mattpocock-skills-unity/commit/3d926c6e1c2024ee2579f9f5fdb362d8dc5e6515) Thanks [@Hissal](https://github.com/Hissal)! - `writing-for-agents` now triggers for any doc an agent reaches by a pointer, such as coding standards or a code map, matching what its body already covers.
+
 ## 1.1.0
 
 ### Minor Changes
