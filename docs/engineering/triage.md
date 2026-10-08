@@ -6,6 +6,8 @@ It is only for issues **you didn't create**. That means raw bug reports, incomin
 
 It also differs from labelling by hand because it recommends and then waits. It gives you its category and state call with reasoning, plus what it found in the codebase, and applies nothing until you tell it to.
 
+In a Unity repo it also asks the [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) router about the repo's optional Unity involvement classification when triaging or selecting issues. Engine requirements are considered separately from readiness and human involvement.
+
 ## When to reach for it
 
 You invoke this by typing `/triage` and then describing what you want in plain language. The [agent](https://www.aihero.dev/ai-coding-dictionary/agent) won't reach for it on its own. Examples: "Show me anything that needs my attention", "let's look at #42", "move #42 to ready-for-agent".

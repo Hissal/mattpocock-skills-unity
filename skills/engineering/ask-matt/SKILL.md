@@ -98,7 +98,7 @@ Off the main flow entirely.
 
 In a Unity repo the flows above hold as they are: each skill pulls in the Unity mechanics it needs through `unity` itself, so there is nothing to route by hand. `/setup-matt-pocock-skills` records the repo's Unity facts in the Unity config (`docs/agents/unity.md`); without it, the Unity skills fall back to stated defaults.
 
-- **`/unity-verification`**: checking a Unity change really compiles and works, when Unity cannot run here or the editor is open, or when you want to know what "verified" covered and what stayed unvalidated.
+- **`/unity-verification`**: checking a Unity change really compiles and works, classifying Unity involvement for issue triage or selection, when Unity cannot run here or the editor is open, or when you want to know what "verified" covered and what stayed unvalidated.
 - **`/unity-assemblies`**: code landing in the wrong assembly, an Editor-only API breaking the Player build, a type the compiler "cannot find" though it exists, or deciding where a new asmdef, reference or define should go.
 - **`/unity-serialization`**: renaming or moving anything Unity stores (a serialized field, type or enum, an asset or a script) without losing values or breaking references, editing and reviewing scene, prefab and `.asset` files, or resolving a merge conflict in one.
 - **`/unity-testing`**: writing or reviewing a Unity test, deciding between EditMode and PlayMode, setting up tests where none exist, a test that fails only under Unity, or which tests to run and how often.

@@ -8,6 +8,8 @@ It is a prompt-driven skill, not a deterministic script. It reads your `git remo
 
 In a Unity repo it also writes the Unity config, `docs/agents/unity.md`: where the Unity project sits, which of your own docs hold your Unity conventions, how Unity checks may run here, and how your assemblies, serialization and statics depart from the Unity skills' rules, and where throwaway prototypes go, each recorded only where it differs from the [Unity skills](https://github.com/Hissal/mattpocock-skills-unity/tree/main/skills/unity)' defaults. It finds the facts itself and shows them as one list to correct, then asks one "keep the defaults?" question for the policies. It always asks where prototypes go, explaining how each candidate folder behaves in git, and creates a new prototype folder that ignores its own contents so work in progress never lands on `main`. In any other repo, nothing Unity appears.
 
+In a Unity repo it also detects an existing Unity involvement convention or offers optional adoption. It reuses the repo's representation through Markdown rules or a convention pointer, with the classification meanings owned by [unity-verification](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity-verification/ISSUE-CLASSIFICATION.md). You can leave classification disabled; re-running setup preserves your choice.
+
 ## When to reach for it
 
 You invoke this by typing `/setup-matt-pocock-skills`; the [agent](https://www.aihero.dev/ai-coding-dictionary/agent) won't reach for it on its own. Its metadata marks it non-invokable on purpose, so no other skill can fire it for you.

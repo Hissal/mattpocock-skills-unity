@@ -59,6 +59,7 @@ Match the need against the needs table. Every row whose need fits is a match. Ca
 | reviewing a change to serialized types or Unity assets | unity-serialization |
 | resolving a conflict in a Unity asset | unity-serialization |
 | slicing Unity work into tickets | unity-serialization, unity-verification |
+| classifying Unity involvement for issue creation, triage or selection | unity-verification |
 | keeping asset churn out of a hotspot scan | unity-serialization |
 | adding or changing static state, a singleton or a static event | unity-code-lifecycle |
 | writing code that runs on load, on a code reload, or on entering or exiting Play mode | unity-code-lifecycle |

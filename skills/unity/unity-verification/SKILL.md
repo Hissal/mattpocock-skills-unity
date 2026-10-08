@@ -1,6 +1,6 @@
 ---
 name: unity-verification
-description: Unity verification rules. Use when checking that a Unity change compiles or works, running Unity tests, building a player, running C# in the Editor, or when Unity cannot run here or the editor is locked.
+description: Unity verification rules. Use when checking that a Unity change compiles or works, running Unity tests, building a player, running C# in the Editor, classifying Unity involvement for issue triage or selection, or when Unity cannot run here or the editor is locked.
 ---
 
 # Unity verification
@@ -72,3 +72,5 @@ Every verification ends with a report:
 ## Slicing work into tickets
 
 A ticket's acceptance criteria name the highest rung it needs and whether that rung needs a connected editor. What runs where: text checks anywhere, including a cloud agent; compile and tests with a local editor, headless or connected; driving live scenes only with a connected editor; judging feel, visuals or a device only with a human (those tickets take the `ready-for-human` triage role). An agent claiming a ticket first checks it can reach the named rung, and passes the ticket up if it cannot, rather than claiming it done.
+
+For issue creation, triage or selection, read [ISSUE-CLASSIFICATION.md](ISSUE-CLASSIFICATION.md) for the optional Unity involvement classification and its repo mapping.
