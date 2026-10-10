@@ -1,0 +1,40 @@
+name: Idea or feedback
+description: A skill change, new Unity capability, or Unity documentation correction.
+labels: ["needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read the [fork scope](https://github.com/Hissal/mattpocock-skills-unity/blob/main/SCOPE.md) and [scope records](https://github.com/Hissal/mattpocock-skills-unity/tree/main/.out-of-scope).
+
+        Unity behavior changes require an observed failure. New Unity skills require a concrete use case and evidence of a gap; compose existing skills when they cover the need. Unity documentation and accuracy corrections can use authoritative source or Editor evidence. These proposals need no failed agent session.
+
+        General skills follow upstream's evidence bar and contribution process; new general skills belong upstream. Frozen general skills permit only the narrow temporary real-defect fix in the fork scope. Preserve repo-specific configuration. Shared behavior-preference switches are out of scope.
+  - type: checkboxes
+    id: read-scope
+    attributes:
+      label: Before filing
+      options:
+        - label: I've read the fork's `SCOPE.md` and `.out-of-scope/`, and this fits the applicable evidence requirements and scope.
+          required: true
+  - type: input
+    id: skill
+    attributes:
+      label: Skill
+      description: Which existing skill this changes, or the proposed new Unity skill or documentation area.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Evidence
+      description: For behavior changes, describe the observed failure and include the session, harness and model. For a new Unity capability, give a concrete use case and gap evidence. For Unity documentation or accuracy corrections, cite authoritative source or Editor evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change
+      description: What you'd change or add, as concretely as you can.
+    validations:
+      required: true

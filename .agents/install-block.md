@@ -27,9 +27,15 @@ The repo is its own marketplace, so you add it once. Third-party marketplaces do
 
 </canonical-block>
 
+## Selected managed routes await validation
+
+Codex, Copilot CLI, and VS Code remain Unvalidated as supported fork routes under the [approved route decision](https://github.com/Hissal/mattpocock-skills-unity/issues/111). Initial temporary Codex and Copilot installations resolved the fork, but the complete invocation and automatic-update checks did not pass the evidence gate. VS Code installation and daily updating were not exercised. Do not advertise these routes or their automatic updates until that gate is met. Use the existing skills.sh route below.
+
+The [2026-10-10 verification record](./install-routes-2026-10-10.md) separates observed installs, skill discovery, and update limitations from historical upstream claims. No bucket restructuring or duplicate skill catalog is needed to defer a claim.
+
 ## Codex, and other agents: skills.sh
 
-The plugin is Claude Code only. Everywhere else, [skills.sh](https://skills.sh) copies editable skill files into the project. Use the whole-set form on `README.md`:
+The currently supported plugin route is Claude Code. Everywhere else, [skills.sh](https://skills.sh) copies editable skill files into the project. Use the whole-set form on `README.md`:
 
 <canonical-block name="skills-sh-whole-set">
 
@@ -41,7 +47,15 @@ Pick the skills you want, and which coding agents to install them on. **The inst
 
 </canonical-block>
 
-…and the single-skill form wherever one skill is named on its own. Note that **`docs/` pages are not a consumer of this block**. See [writing-docs.md](./writing-docs.md).
+Updates are manual. Copy the following update guidance wherever the whole-set install appears:
+
+<canonical-block name="skills-sh-update">
+
+To update, run `npx skills@latest update`, and re-run `npx skills@latest add Hissal/mattpocock-skills-unity` to pick up new skills. Updates do not replace re-running `add` for newly added skills.
+
+</canonical-block>
+
+Use the single-skill form wherever one skill is named on its own. Note that **`docs/` pages are not a consumer of this block**. See [writing-docs.md](./writing-docs.md).
 
 <canonical-block name="skills-sh-one-skill">
 

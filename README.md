@@ -21,6 +21,8 @@ Two ways in, two philosophies. **The [Claude Code plugin](https://code.claude.co
 
 Skill names match upstream's. Uninstall `mattpocock-skills` (or upstream's skills.sh copies) before installing this fork, or you get every skill twice.
 
+Codex, Copilot CLI, and VS Code remain Unvalidated as supported fork routes. Initial Codex and Copilot installations resolved the fork in temporary configuration, but complete invocation and automatic-update verification remains outstanding. VS Code installation and daily updating were not exercised. Use skills.sh for these agents. See the [verification record](./.agents/install-routes-2026-10-10.md) for evidence and limits.
+
 ### 1. Get the skills
 
 <details>
@@ -54,6 +56,8 @@ npx skills@latest add Hissal/mattpocock-skills-unity
 
 Pick the skills you want, and which coding agents to install them on. **The installer lets you choose which skills to take: make sure `setup-matt-pocock-skills` is one of them.**
 
+To update, run `npx skills@latest update`, and re-run `npx skills@latest add Hissal/mattpocock-skills-unity` to pick up new skills. Updates do not replace re-running `add` for newly added skills.
+
 </details>
 
 <details>
@@ -65,7 +69,9 @@ Use the same installer, on any agent, including Claude Code:
 npx skills@latest add Hissal/mattpocock-skills-unity
 ```
 
-It writes the skills into your repo as ordinary files you own and can edit. Nothing updates behind your back; pull the latest changes when you want them with `npx skills update`.
+It writes the skills into your repo as ordinary files you own and can edit. Updates are manual.
+
+To update, run `npx skills@latest update`, and re-run `npx skills@latest add Hissal/mattpocock-skills-unity` to pick up new skills. Updates do not replace re-running `add` for newly added skills.
 
 </details>
 
@@ -248,3 +254,9 @@ None. Every Unity skill is model-invoked, so the agent and the other skills can 
 - **[unity-code-lifecycle](./skills/unity/unity-code-lifecycle/SKILL.md)**: Unity code lifecycle rules. Gives every static, singleton and static event a reset path that holds with domain reload off, picks the lifecycle API by Unity version and the module's existing pattern, and flags load-code hazards.
 - **[unity-prototyping](./skills/unity/unity-prototyping/SKILL.md)**: Unity prototyping rules. Builds a throwaway prototype in the engine by default, keeps it in its own folder and editor-only asmdef out of production code and player builds, runs it from one menu item with a live variant switcher, and removes it only after a GUID grep.
 - **[unity-debugging](./skills/unity/unity-debugging/SKILL.md)**: Unity debugging mechanics. Drives Play mode as one scripted loop that goes red on the bug (twice when domain reload is off, to catch second-Play bugs), uses `eval` and `run_script` as the REPL, maps a symptom to the Unity skill for its class, reads Player logs from Development Builds, and measures performance against a baseline.
+
+## Contributing and questions
+
+Read [SCOPE.md](./SCOPE.md) before proposing changes. This fork maintains Unity skills and Unity deltas; general skills follow upstream. Prefer the Bug and Idea forms when they fit. Blank Issues remain available for questions, cross-skill reports, and repository documentation fixes.
+
+Questions about this fork or its Unity adaptation belong in [fork Issues](https://github.com/Hissal/mattpocock-skills-unity/issues), including Unity deltas in upstream skill files. [Upstream Discussions](https://github.com/mattpocock/skills/discussions) are for general upstream skill questions. Information requests, inactivity closure, and manual reopening follow the [fork triage guidance](./docs/agents/triage-labels.md).

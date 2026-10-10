@@ -23,7 +23,7 @@ Skills are organized into bucket folders under `skills/`:
 
 Every skill in `engineering/`, `productivity/`, or `unity/` (the **promoted** buckets) must have a reference in the top-level `README.md` and an entry in `.claude-plugin/plugin.json`'s `skills` array (the Claude Code plugin ships exactly the promoted set). The top-level `README.md` lists `unity/` skills in their own **Unity** section, after Engineering and Productivity. Skills in `misc/`, `in-progress/`, and `deprecated/` must not appear in either.
 
-Install commands are copied verbatim from [.agents/install-block.md](./.agents/install-block.md). `.claude-plugin/marketplace.json` makes the repo its own single-plugin marketplace, which is this fork's documented Claude Code route. Run `npm run validate-plugin` after touching either manifest: `claude plugin validate . --strict` with the warnings about this `CLAUDE.md` and a gitignored `CLAUDE.local.md` at the plugin root allowed, since both are contributor context the manifest cannot exclude. Why a Claude plugin but not (yet) a Codex one lives in [.agents/adr/0002-ship-as-a-claude-code-plugin.md](./.agents/adr/0002-ship-as-a-claude-code-plugin.md).
+Install commands are copied verbatim from [.agents/install-block.md](./.agents/install-block.md). `.claude-plugin/marketplace.json` makes the repo its own single-plugin marketplace, which is this fork's documented Claude Code route. Run `npm run validate-plugin` after touching either manifest: `claude plugin validate . --strict` with the warnings about this `CLAUDE.md` and a gitignored `CLAUDE.local.md` at the plugin root allowed, since both are contributor context the manifest cannot exclude. Codex, Copilot CLI, and VS Code managed routes remain Unvalidated under [#111](https://github.com/Hissal/mattpocock-skills-unity/issues/111). Do not copy upstream supported-route or automatic-update claims into fork guidance. Direct fork evidence and deferrals live in [.agents/install-routes-2026-10-10.md](./.agents/install-routes-2026-10-10.md). Historical distribution decisions and the current evidence gate live in [.agents/adr/0002-ship-as-a-claude-code-plugin.md](./.agents/adr/0002-ship-as-a-claude-code-plugin.md).
 
 Each skill entry in the top-level `README.md` must link the skill name to its `SKILL.md`.
 
@@ -38,3 +38,9 @@ Every `SKILL.md` is either user-invoked (`disable-model-invocation: true` plus `
 To (re)link every skill outside `deprecated/` and `misc/` into the local harness skill directories (`~/.claude/skills`, `~/.agents/skills`), run `scripts/link-skills.sh`. Each entry is a symlink into this repo, so a `git pull` keeps installed skills current; re-run the script after adding, removing, or renaming a skill.
 
 No em-dashes anywhere in this repo's prose (`SKILL.md` files, docs, `README.md`, `CHANGELOG.md`, ADRs, changesets, code comments). Where a sentence reaches for one, rewrite it instead with a comma, colon, period, parentheses, or a conjunction, whichever the sentence actually wants; never do a blind character substitution.
+
+## Agent skills
+
+### Triage labels and contributor scope
+
+Before triaging or proposing contributions, read [SCOPE.md](./SCOPE.md) for fork evidence requirements, Unity exceptions, and upstream responsibilities. Canonical triage names are unchanged; read [docs/agents/triage-labels.md](./docs/agents/triage-labels.md) when labeling, requesting information, or manually reopening an Issue.
