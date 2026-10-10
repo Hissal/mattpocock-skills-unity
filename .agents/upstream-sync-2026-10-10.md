@@ -1,6 +1,6 @@
 # Complete upstream sync through 49dd158
 
-Whole-result implementation record for [#115](https://github.com/Hissal/mattpocock-skills-unity/issues/115), under [#107](https://github.com/Hissal/mattpocock-skills-unity/issues/107). The completed source result combines #112, #113, and #114 on `sync/upstream-2026-10-10`. Final review, integration-branch checks, push, and PR readiness remain handoff work. Landing requires a merge commit and does not authorize a release.
+Whole-result implementation record for [#115](https://github.com/Hissal/mattpocock-skills-unity/issues/115), under [#107](https://github.com/Hissal/mattpocock-skills-unity/issues/107). The completed source result combines #112, #113, and #114 on `sync/upstream-2026-10-10`. Final integration verification is recorded below; PR delivery uses the existing PR #116. Landing requires a merge commit and does not authorize a release.
 
 ## Whole-result acceptance on 2026-10-10
 
@@ -19,7 +19,13 @@ Fresh checks on the combined source result, including the new changeset, passed:
 - `npm run check-plugin-version`, with package and plugin at `1.1.0`.
 - `git diff --check`.
 
-These checks ran on Windows with Node `22.23.2`. Approved execution outside the sandbox was required because sandbox process startup was unavailable. The integration branch must repeat its combined checks after this housekeeping commit is merged. Hosted CI and the full Standards/Spec review are pending at this handoff.
+These checks ran on Windows with Node `22.23.2`. Approved execution outside the sandbox was required because sandbox process startup was unavailable. The integration branch repeated all four checks after the housekeeping merge; they passed. Hosted CI and review results are recorded below.
+
+## Final integration verification
+
+The completed integration tip `7a9a9ff25405c37e67b8794c39cba8757e5a52e6` passed `npm run check`, `npm run validate-plugin`, `npm run check-plugin-version`, and `git diff --check origin/main...HEAD` in the integration worktree. Separate read-only Standards and Spec reviewers assessed `3d926c6...7a9a9ff`; each reported zero findings. [Hosted Check](https://github.com/Hissal/mattpocock-skills-unity/actions/runs/38081056446/job/114297876445) passed on that reviewed tip.
+
+This final record is a documentation-only follow-up. PR #116 carries the final tip and its hosted check status. The original checkout still contains only the two staged research files. All runtime limitations and installation deferrals below remain applicable.
 
 ## Approved outcomes and carried evidence
 
