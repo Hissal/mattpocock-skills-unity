@@ -21,6 +21,8 @@ Two ways in, two philosophies. **The [Claude Code plugin](https://code.claude.co
 
 Skill names match upstream's. Uninstall `mattpocock-skills` (or upstream's skills.sh copies) before installing this fork, or you get every skill twice.
 
+Codex, Copilot CLI, and VS Code remain Unvalidated as supported fork routes. Initial Codex and Copilot installations resolved the fork in temporary configuration, but complete invocation and automatic-update verification remains outstanding. VS Code installation and daily updating were not exercised. Use skills.sh for these agents. See the [verification record](./.agents/install-routes-2026-10-10.md) for evidence and limits.
+
 ### 1. Get the skills
 
 <details>
@@ -54,6 +56,8 @@ npx skills@latest add Hissal/mattpocock-skills-unity
 
 Pick the skills you want, and which coding agents to install them on. **The installer lets you choose which skills to take: make sure `setup-matt-pocock-skills` is one of them.**
 
+To update, run `npx skills@latest update`, and re-run `npx skills@latest add Hissal/mattpocock-skills-unity` to pick up new skills. Updates do not replace re-running `add` for newly added skills.
+
 </details>
 
 <details>
@@ -65,7 +69,9 @@ Use the same installer, on any agent, including Claude Code:
 npx skills@latest add Hissal/mattpocock-skills-unity
 ```
 
-It writes the skills into your repo as ordinary files you own and can edit. Nothing updates behind your back; pull the latest changes when you want them with `npx skills update`.
+It writes the skills into your repo as ordinary files you own and can edit. Updates are manual.
+
+To update, run `npx skills@latest update`, and re-run `npx skills@latest add Hissal/mattpocock-skills-unity` to pick up new skills. Updates do not replace re-running `add` for newly added skills.
 
 </details>
 
