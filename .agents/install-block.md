@@ -35,7 +35,7 @@ The [2026-10-10 verification record](./install-routes-2026-10-10.md) separates o
 
 ## Codex, and other agents: skills.sh
 
-The plugin is Claude Code only. Everywhere else, [skills.sh](https://skills.sh) copies editable skill files into the project. Use the whole-set form on `README.md`:
+The currently supported plugin route is Claude Code. Everywhere else, [skills.sh](https://skills.sh) copies editable skill files into the project. Use the whole-set form on `README.md`:
 
 <canonical-block name="skills-sh-whole-set">
 

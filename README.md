@@ -56,6 +56,8 @@ npx skills@latest add Hissal/mattpocock-skills-unity
 
 Pick the skills you want, and which coding agents to install them on. **The installer lets you choose which skills to take: make sure `setup-matt-pocock-skills` is one of them.**
 
+To update, run `npx skills@latest update`, and re-run `npx skills@latest add Hissal/mattpocock-skills-unity` to pick up new skills. Updates do not replace re-running `add` for newly added skills.
+
 </details>
 
 <details>
