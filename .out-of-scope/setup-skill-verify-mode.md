@@ -1,5 +1,15 @@
 # Verify/Check Mode for `setup-matt-pocock-skills`
 
+## Fork disposition
+
+Use the existing setup invocation with a natural-language verification request instead of introducing a separate flag or skill.
+
+Approved in [fork Issue #108](https://github.com/Hissal/mattpocock-skills-unity/issues/108).
+
+## Historical upstream record
+
+The text below records upstream's rationale and prior requests at [49dd158](https://github.com/mattpocock/skills/blob/49dd158d1076134a641b33efb035946536778336/.out-of-scope/setup-skill-verify-mode.md). First-person statements and all prior-request references are upstream history. The fork disposition above governs this fork.
+
 This project will not add a dedicated verify/check mode (or a separate verify skill) for `setup-matt-pocock-skills`.
 
 ## Why this is out of scope
@@ -12,4 +22,4 @@ Keeping configuration management to a single skill also avoids the maintenance c
 
 ## Prior requests
 
-- #106: Feature request: verify/check mode for setup-matt-pocock-skills
+- [#106](https://github.com/mattpocock/skills/issues/106): Feature request: verify/check mode for setup-matt-pocock-skills

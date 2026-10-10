@@ -254,3 +254,9 @@ None. Every Unity skill is model-invoked, so the agent and the other skills can 
 - **[unity-code-lifecycle](./skills/unity/unity-code-lifecycle/SKILL.md)**: Unity code lifecycle rules. Gives every static, singleton and static event a reset path that holds with domain reload off, picks the lifecycle API by Unity version and the module's existing pattern, and flags load-code hazards.
 - **[unity-prototyping](./skills/unity/unity-prototyping/SKILL.md)**: Unity prototyping rules. Builds a throwaway prototype in the engine by default, keeps it in its own folder and editor-only asmdef out of production code and player builds, runs it from one menu item with a live variant switcher, and removes it only after a GUID grep.
 - **[unity-debugging](./skills/unity/unity-debugging/SKILL.md)**: Unity debugging mechanics. Drives Play mode as one scripted loop that goes red on the bug (twice when domain reload is off, to catch second-Play bugs), uses `eval` and `run_script` as the REPL, maps a symptom to the Unity skill for its class, reads Player logs from Development Builds, and measures performance against a baseline.
+
+## Contributing and questions
+
+Read [SCOPE.md](./SCOPE.md) before proposing changes. This fork maintains Unity skills and Unity deltas; general skills follow upstream. Prefer the Bug and Idea forms when they fit. Blank Issues remain available for questions, cross-skill reports, and repository documentation fixes.
+
+Questions about this fork or its Unity adaptation belong in [fork Issues](https://github.com/Hissal/mattpocock-skills-unity/issues), including Unity deltas in upstream skill files. [Upstream Discussions](https://github.com/mattpocock/skills/discussions) are for general upstream skill questions. Information requests, inactivity closure, and manual reopening follow the [fork triage guidance](./docs/agents/triage-labels.md).

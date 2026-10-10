@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions about this fork and its Unity adaptation
+    url: https://github.com/Hissal/mattpocock-skills-unity/issues/new
+    about: Ask here about Unity skills, Unity deltas, and this fork, including changes to upstream skill files.
+  - name: General upstream skill questions and discussion
+    url: https://github.com/mattpocock/skills/discussions
+    about: Questions about general upstream skills belong in upstream Discussions.
