@@ -2,7 +2,7 @@
 
 `ask-matt` is the router over the skills in this repo. You describe the situation you are in (an idea you cannot start, a pile of incoming bug reports, a [session](https://www.aihero.dev/ai-coding-dictionary/session) that has run long), and it names the skill or the sequence of skills that fits, plus where the human decisions in that sequence sit.
 
-It recommends and stops. It does not grill, write a [spec](https://www.aihero.dev/ai-coding-dictionary/spec), open a file or fire the skill it just named; what you get back is the next thing to type, and you type it. It is also a hand-written map of the skills in this repo rather than a scan of what you have installed, so it will not route you over your own skills or another author's.
+It recommends and stops. It does not grill, write a [spec](https://www.aihero.dev/ai-coding-dictionary/spec), or fire the skill it just named; what you get back is the next thing to type, and you type it. It is also a hand-written map of the skills in this repo rather than a scan of what you have installed, so it will not route you over your own skills or another author's.
 
 In a Unity repo it also maps the Unity side: which Unity skill fits your situation, with [unity](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity/SKILL.md) as the fallback. Unity involvement classification for issue triage or selection belongs to [unity-verification](https://github.com/Hissal/mattpocock-skills-unity/blob/main/skills/unity/unity-verification/SKILL.md).
 

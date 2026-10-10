@@ -58,8 +58,6 @@ Phase 5 has one exception. The agent writes the regression test before the fix, 
 
 If the agent forces a failing result by changing code or a fixture, it first diffs against a pristine copy to prove that change landed. A failed mutation cannot establish that the test catches the bug.
 
-If the agent forces a failing result by changing code or a fixture, it first diffs against a pristine copy to prove that change landed. A failed mutation cannot establish that the test catches the bug.
-
 ## Common questions
 
 **It fires on quick questions where I just wanted a direct answer.**

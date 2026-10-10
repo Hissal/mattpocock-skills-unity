@@ -33,7 +33,7 @@ No automatic closure policy or repository-setting change is enabled by this slic
 
 ## Validation on 2026-10-10
 
-Repository checks ran on Windows with Node and the installed Claude CLI:
+Repository checks ran on Windows with Node `v22.23.2` and Claude Code `2.1.296`. GitHub CLI was `2.90.0`, so the newer sub-issue command path was source-reviewed and its documented API fallback remains relevant:
 
 - `npm run check`: passed, including its plugin-version and plugin-validation checks.
 - `npm run validate-plugin`: passed strict validation, with only the documented root contributor-context warnings excluded.

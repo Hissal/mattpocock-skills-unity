@@ -41,7 +41,7 @@ The **frontier** is the set of open, unblocked, unclaimed tickets (the edge of t
 
 ## The four decision-ticket types
 
-Every ticket carries a `wayfinder:<type>` label. Maps and tickets use only `wayfinder:` labels, and the ticket's type decides how it is resolved. Cross-references use real issue IDs once the tickets exist. Maps and tickets use only `wayfinder:` labels, and the ticket's type decides how it is resolved. Cross-references use real issue IDs once the tickets exist. Each ticket is either **[HITL](https://www.aihero.dev/ai-coding-dictionary/human-in-the-loop)** (worked with a human who speaks for themselves) or **[AFK](https://www.aihero.dev/ai-coding-dictionary/afk)** (driven by the agent alone). A HITL ticket resolves only through the live exchange. An agent that answers its own [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling) questions has broken it.
+Every ticket carries a `wayfinder:<type>` label. Maps and tickets use only `wayfinder:` labels, and the ticket's type decides how it is resolved. Cross-references use real issue IDs once the tickets exist. Each ticket is either **[HITL](https://www.aihero.dev/ai-coding-dictionary/human-in-the-loop)** (worked with a human who speaks for themselves) or **[AFK](https://www.aihero.dev/ai-coding-dictionary/afk)** (driven by the agent alone). A HITL ticket resolves only through the live exchange. An agent that answers its own [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling) questions has broken it.
 
 | Type | Mode | Reach for it when | Resolved by |
 | --- | --- | --- | --- |
@@ -53,8 +53,6 @@ Every ticket carries a `wayfinder:<type>` label. Maps and tickets use only `wayf
 `task` is the only type that *does* rather than decides. It belongs on the map only because it unblocks a decision, never because it delivers part of the destination. This type goes wrong most often in practice. Agents read it as an implementation step and start to write product code inside the map.
 
 Research is the only exception to *one ticket per session*.
-
-Research branches are pushed for their context pointers and never opened as PRs, because they are not merged.
 
 Research branches are pushed for their context pointers and never opened as PRs, because they are not merged.
 
