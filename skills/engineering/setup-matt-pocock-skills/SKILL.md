@@ -106,6 +106,8 @@ Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.
 
 In a Unity repo, end the block with a `### Unity` sub-block: a one-line summary of the Unity project path(s) and shape, then ``See `docs/agents/unity.md`.`` Anywhere else, leave it out without comment.
 
+When Section B ran on GitHub or GitLab, create each configured label the tracker lacks (`gh label create` / `glab label create`).
+
 Then write the docs files using the seed templates in this skill folder as a starting point:
 
 - [issue-tracker-github.md](./issue-tracker-github.md): GitHub issue tracker

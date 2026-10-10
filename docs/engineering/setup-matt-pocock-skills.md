@@ -4,6 +4,8 @@
 
 Those files are the only thing that varies between repos. The skills themselves are identical everywhere. They read `docs/agents/issue-tracker.md` at run time and do what it says. That is why the set is not tied to GitHub, and why you never edit a skill file to point it at another tracker. Invoking it with "link the skills to a custom issue tracker" works with anything you can connect to programmatically, with no changes to the skills.
 
+On GitHub or GitLab, it creates configured triage labels that are missing after you approve the vocabulary. Existing labels stay in use.
+
 It is a prompt-driven skill, not a deterministic script. It reads your `git remote`, `CLAUDE.md` and `GLOSSARY.md`, proposes what it found, and waits for you to confirm before it writes anything.
 
 In a Unity repo it also writes the Unity config, `docs/agents/unity.md`: where the Unity project sits, which of your own docs hold your Unity conventions, how Unity checks may run here, and how your assemblies, serialization and statics depart from the Unity skills' rules, and where throwaway prototypes go, each recorded only where it differs from the [Unity skills](https://github.com/Hissal/mattpocock-skills-unity/tree/main/skills/unity)' defaults. It finds the facts itself and shows them as one list to correct, then asks one "keep the defaults?" question for the policies. It always asks where prototypes go, explaining how each candidate folder behaves in git, and creates a new prototype folder that ignores its own contents so work in progress never lands on `main`. In any other repo, nothing Unity appears.

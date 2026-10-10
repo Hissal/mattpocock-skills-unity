@@ -60,7 +60,7 @@ This is a known bug, and it is not fixed. Most of the skills the router routes y
 
 **It described a skill's behaviour, and the skill doesn't do that.**
 
-This is also a real bug, and also not fixed. The router answers from its own one-line summary of each skill rather than from the skill. One detailed report tracked three instances in a single session, including a recommendation to skip [to-spec](https://aihero.dev/skills-to-spec) based only on the summary "turn the thread into a spec". The router never opened `to-spec/SKILL.md`. In every case it verified only after the user pushed back, and never on its own initiative. Skipping `to-spec` there cost a real seam check, and the tickets that came out undercounted the work. When the router states something about another skill that you will act on, ask it to open that `SKILL.md` first. The same applies to questions the map does not cover at all, such as whether to use [plan mode](https://www.aihero.dev/ai-coding-dictionary/agent-mode): that answer is the [model](https://www.aihero.dev/ai-coding-dictionary/model)'s inference, not something written down here.
+The router previously answered from its own summaries without opening the skill. It now reads that skill's `SKILL.md` before describing its behaviour or recommending that you skip a step. Check the trace for that read before acting on the recommendation. Questions outside the map, such as whether to use [plan mode](https://www.aihero.dev/ai-coding-dictionary/agent-mode), still depend on the [model](https://www.aihero.dev/ai-coding-dictionary/model)'s inference.
 
 **Why is it prose instead of a numbered checklist?**
 

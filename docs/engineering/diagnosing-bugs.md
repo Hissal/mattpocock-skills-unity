@@ -56,6 +56,10 @@ The phases are gates, not a checklist. The agent cannot enter a phase until a sp
 
 Phase 5 has one exception. The agent writes the regression test before the fix, but only if a **correct seam** exists for it: one where the test exercises the real bug pattern as it occurs at the call site. Where the only available seam is too shallow, the skill tells the agent to say so instead of writing a test that gives false confidence. The missing seam is itself a finding, and the agent records it instead of hiding it.
 
+If the agent forces a failing result by changing code or a fixture, it first diffs against a pristine copy to prove that change landed. A failed mutation cannot establish that the test catches the bug.
+
+If the agent forces a failing result by changing code or a fixture, it first diffs against a pristine copy to prove that change landed. A failed mutation cannot establish that the test catches the bug.
+
 ## Common questions
 
 **It fires on quick questions where I just wanted a direct answer.**
