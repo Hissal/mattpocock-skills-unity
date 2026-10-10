@@ -23,8 +23,12 @@ A skill that also exists in `mattpocock/skills`. Its Unity changes stay small ed
 _Avoid_: original, base skill
 
 **Unity delta**:
-The fork's change to an **Upstream skill** (or other upstream file): small, in place, and kept across every **Upstream sync**. Git is its record: the diff against upstream shows every Unity delta and nothing else.
+The fork's Unity adaptation of an **Upstream skill** (or other upstream file): small, in place, and kept across every **Upstream sync**.
 _Avoid_: patch, override
+
+**Temporary upstream fix**:
+A small fork correction to a defect in upstream's general behavior, retained until upstream resolves the defect. It is distinct from a **Unity delta**.
+_Avoid_: Unity delta (for a general upstream defect)
 
 **Upstream sync**:
 Merging `mattpocock/skills` into the fork, as a merge commit that keeps every **Unity delta** and leaves the fork's own versioning untouched.
