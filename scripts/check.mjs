@@ -8,6 +8,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parse } from "yaml";
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PROMOTED = ["engineering", "productivity", "unity"];
@@ -53,6 +54,22 @@ const skills = files
   .map((f) => f.match(/^skills\/([^/]+)\/([^/]+)\/SKILL\.md$/))
   .filter(Boolean)
   .map(([, bucket, name]) => ({ bucket, name }));
+
+// skills.sh skips a skill whose frontmatter is not strict YAML, such as an
+// unquoted description containing ": ". Claude Code's own loader tolerates it.
+for (const { bucket, name } of skills) {
+  const file = `skills/${bucket}/${name}/SKILL.md`;
+  const frontmatter = read(file).match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!frontmatter) {
+    fail(file, "missing frontmatter");
+    continue;
+  }
+  try {
+    parse(frontmatter[1]);
+  } catch (e) {
+    fail(file, `frontmatter is not valid YAML: ${e.message.split("\n")[0]}`);
+  }
+}
 
 const readme = read("README.md");
 const pluginSkills = new Set(
