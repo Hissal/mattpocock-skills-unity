@@ -2,6 +2,12 @@
 
 This fork versions on its own line. For releases of `mattpocock/skills` before the fork, and for what each upstream sync brought in, see [upstream's changelog](https://github.com/mattpocock/skills/blob/main/CHANGELOG.md).
 
+## 1.2.1
+
+### Patch Changes
+
+- [#123](https://github.com/Hissal/mattpocock-skills-unity/pull/123) [`1626a0c`](https://github.com/Hissal/mattpocock-skills-unity/commit/1626a0cdbb7442eebff576a3fedecfe5a6efd45c) Thanks [@Hissal](https://github.com/Hissal)! - `writing-for-agents` installs through skills.sh again: its description is now quoted, so strict YAML parsers no longer reject the frontmatter and skip the skill.
+
 ## 1.2.0
 
 ### Minor Changes
