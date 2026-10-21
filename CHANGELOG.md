@@ -2,6 +2,12 @@
 
 This fork versions on its own line. For releases of `mattpocock/skills` before the fork, and for what each upstream sync brought in, see [upstream's changelog](https://github.com/mattpocock/skills/blob/main/CHANGELOG.md).
 
+## 1.2.2
+
+### Patch Changes
+
+- [#126](https://github.com/Hissal/mattpocock-skills-unity/pull/126) [`4f30320`](https://github.com/Hissal/mattpocock-skills-unity/commit/4f30320d4ac1c5d747eea1c02b97017529ed578b) Thanks [@Hissal](https://github.com/Hissal)! - Unity verification no longer runs every cheaper check before the one a change needs: `unity-verification` picks each check by the risk it establishes, `unity-testing` narrows when the full EditMode suite and PlayMode tests run, and a visual or content edit is checked by inspection instead of test suites.
+
 ## 1.2.1
 
 ### Patch Changes
