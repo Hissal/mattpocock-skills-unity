@@ -19,12 +19,10 @@ This skill decides which check runs, where, and how to read its result. What to 
 6. Player build
 7. CI
 
-**Rung rule:** for each behaviour the change touches, or failure it risks, pick the cheapest rung that establishes it, and stop there. Rungs are not cumulative gates: a higher rung never requires every cheaper one first. The one prerequisite is that code compiles and changed assets import before anything runs them. A change is verified by the rungs it passed, each for what it established.
+**Rung rule:** for each behaviour the change touches, or failure it risks, pick the cheapest rung that establishes it, and stop there. Rungs are not cumulative gates: a higher rung never requires every cheaper one first. The one prerequisite is that code compiles and changed assets import before anything runs them. The test rungs, the full EditMode suite at final review among them, run when `unity-testing`'s **Choosing tests** names them. A change is verified by the rungs it passed, each for what it established.
 
-- **Compile** is a gate of each batch run, not a separate recurring check: a headless test run compiles first and fails on a compile error. With a connected editor, `unity recompile` is cheap enough to run more often. It also imports changed assets: a scene, prefab, asset or copy edit that changes no code behaviour (moving, restyling or rewording existing content) needs this rung plus a focused inspection (driving the scene through `unity-debugging`, or a manual check in the report), and no test rung.
-- **Targeted tests** are the development loop: the tests covering the changed behaviour, as `unity-testing` names them.
-- **Full EditMode suite** runs once, at the final review of a completed code change or a prototype's promotion into production code. Never for each iteration, a prototype hand-off, or an edit that changes no code behaviour.
-- **PlayMode** runs only for a changed contract that needs the real engine lifecycle, frames, physics or scene integration, which EditMode cannot establish (`unity-testing`'s mode rule). Entering Play to inspect a scene or a prototype is a focused inspection, not this rung. A change to cleanup, or to state that persists between Play sessions, is checked across two Play sessions (`unity-debugging`'s Play loop), with no unrelated scenarios.
+- **Compile** is a gate of each batch run, not a separate recurring check: a headless test run compiles first and fails on a compile error. With a connected editor, `unity recompile` is cheap enough to run more often. It also imports changed assets.
+- **Focused inspection**: looking at the changed thing itself, by driving the scene through `unity-debugging` or as a manual check in the report. It is how an edit that changes no code behaviour (moving, restyling or rewording existing content) is checked after its import. Entering Play to inspect a scene or a prototype is a focused inspection, not the PlayMode rung.
 - **Player build** runs only when the change can break a build-only path (`#if` and `UNITY_EDITOR` branches, `UnityEditor` in a runtime assembly, stripping or IL2CPP, platform defines), or when the user asks. It builds the Unity config's build targets, with its build method or profile, when the config names them.
 - **Test filters**: the test rungs apply the Unity config's test filters, when it names any.
 - **Heavy runs**: a full suite, a PlayMode run or a player build starts without warning, unless the Unity config turns the heavy-run warning on; then ask the user first.
@@ -69,8 +67,8 @@ Leave pushing and triggering CI to the user. Name the rungs CI would cover and w
 
 Every verification ends with a report:
 
-- **Ran**: each rung run or reused, with the environment, the revision and the result (for tests, the counts).
-- **Skipped**: each rung the risk needed that did not run, with the reason: an environment gap (no editor, locked project, no licence, cold import declined, CI not triggered) or not needed for this risk.
+- **Ran**: each rung or focused inspection run or reused, with the environment, the revision and the result (for tests, the counts).
+- **Skipped**: each rung the risk needed that did not run, with the environment gap that stopped it (no editor, locked project, no licence, cold import declined, CI not triggered).
 - **Unvalidated**: each behaviour or risk whose rung did not run.
 - **Known failures**: unrelated failures seen, left uninvestigated.
 - **Manual checks**: what no rung can judge (feel, visuals, audio, timing), as concrete steps for the user.
