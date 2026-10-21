@@ -19,13 +19,16 @@ This skill decides which check runs, where, and how to read its result. What to 
 6. Player build
 7. CI
 
-**Rung rule:** find the lowest rung that can catch the failure the change risks, run every cheaper rung before it as a gate, and stop there. A change is verified up to the highest rung it passed.
+**Rung rule:** for each behaviour the change touches, or failure it risks, pick the cheapest rung that establishes it, and stop there. Rungs are not cumulative gates: a higher rung never requires every cheaper one first. The one prerequisite is that code compiles and changed assets import before anything runs them. The test rungs, the full EditMode suite at final review among them, run when `unity-testing`'s **Choosing tests** names them. A change is verified by the rungs it passed, each for what it established.
 
-- **Compile** is a gate of each batch run, not a separate recurring check: a headless test run compiles first and fails on a compile error. With a connected editor, `unity recompile` is cheap enough to run more often.
+- **Compile** is a gate of each batch run, not a separate recurring check: a headless test run compiles first and fails on a compile error. With a connected editor, `unity recompile` is cheap enough to run more often. It also imports changed assets.
+- **Focused inspection**: looking at the changed thing itself, by driving the scene through `unity-debugging` or as a manual check in the report. It is how an edit that changes no code behaviour (moving, restyling or rewording existing content) is checked after its import. Entering Play to inspect a scene or a prototype is a focused inspection, not the PlayMode rung.
 - **Player build** runs only when the change can break a build-only path (`#if` and `UNITY_EDITOR` branches, `UnityEditor` in a runtime assembly, stripping or IL2CPP, platform defines), or when the user asks. It builds the Unity config's build targets, with its build method or profile, when the config names them.
 - **Test filters**: the test rungs apply the Unity config's test filters, when it names any.
 - **Heavy runs**: a full suite, a PlayMode run or a player build starts without warning, unless the Unity config turns the heavy-run warning on; then ask the user first.
 - **Rung commands**: when the Unity config maps a rung to a repo command, run that command for the rung instead of the generic CLI path. A rung with no command falls back to the default. A compile-only (Roslyn) check is not a default rung; it runs only when a rung command names one.
+- **Reused evidence**: a result stands, with the revision it ran on, until a later edit touches what it established; only then does that rung run again.
+- **Unrelated failures**: a failure the change could not plausibly cause, and that does not block the check at hand, goes in the report as a known failure and gets its own investigation, never one inside this change.
 
 ## Where Unity runs
 
@@ -64,13 +67,14 @@ Leave pushing and triggering CI to the user. Name the rungs CI would cover and w
 
 Every verification ends with a report:
 
-- **Ran**: each rung run, with the environment and the result (for tests, the counts).
-- **Skipped**: each rung the risk needed that did not run, with the reason: an environment gap (no editor, locked project, no licence, cold import declined, CI not triggered) or not needed for this risk.
-- **Unvalidated**: say "verified up to rung N", then list everything the risk needed above N as unvalidated.
+- **Ran**: each rung or focused inspection run or reused, with the environment, the revision and the result (for tests, the counts).
+- **Skipped**: each rung the risk needed that did not run, with the environment gap that stopped it (no editor, locked project, no licence, cold import declined, CI not triggered).
+- **Unvalidated**: each behaviour or risk whose rung did not run.
+- **Known failures**: unrelated failures seen, left uninvestigated.
 - **Manual checks**: what no rung can judge (feel, visuals, audio, timing), as concrete steps for the user.
 
 ## Slicing work into tickets
 
-A ticket's acceptance criteria name the highest rung it needs and whether that rung needs a connected editor. What runs where: text checks anywhere, including a cloud agent; compile and tests with a local editor, headless or connected; driving live scenes only with a connected editor; judging feel, visuals or a device only with a human (those tickets take the `ready-for-human` triage role). An agent claiming a ticket first checks it can reach the named rung, and passes the ticket up if it cannot, rather than claiming it done.
+A ticket's acceptance criteria name the rungs it needs and whether any needs a connected editor. What runs where: text checks anywhere, including a cloud agent; compile and tests with a local editor, headless or connected; driving live scenes only with a connected editor; judging feel, visuals or a device only with a human (those tickets take the `ready-for-human` triage role). An agent claiming a ticket first checks it can reach the named rungs, and passes the ticket up if it cannot, rather than claiming it done.
 
 For issue creation, triage or selection, read [ISSUE-CLASSIFICATION.md](ISSUE-CLASSIFICATION.md) for the optional Unity involvement classification and its repo mapping.

@@ -81,4 +81,4 @@ This skill names the checks; call `unity-verification` through the Skill tool fo
 
 - **Text checks**: every file of the prototype is inside its subfolder; its asmdef has `autoReferenced: false` and `defineConstraints: ["UNITY_EDITOR"]` (or, without one, every file is wrapped in `#if UNITY_EDITOR`); no production asmdef references it; no prototype scene is in the build profile; nothing of it is staged on the working branch; the host scene is not modified in the diff.
 - **Compile** before hand-over and after removal.
-- **Play**: the menu item enters Play cleanly, through a connected editor. Otherwise unvalidated.
+- **Play**: the menu item enters Play cleanly, through a connected editor. Otherwise unvalidated. This is a focused inspection, not `unity-verification`'s PlayMode rung.

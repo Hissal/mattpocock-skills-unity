@@ -45,8 +45,9 @@ Feel, visuals, audio and timing that a human perceives are out of a test's reach
 ## Choosing tests
 
 - **During the loop**: the test assemblies of the module being changed, only.
-- **Before calling the change done**: the full EditMode suite, once.
-- **PlayMode**: when the change touches lifecycle, physics or scene code, or the module already has PlayMode tests.
+- **At final review** of a completed code change or a prototype's promotion into production code: the full EditMode suite, once. Not for each iteration or a prototype hand-off.
+- **PlayMode**: only when a changed contract needs the engine running (the mode rule) and EditMode cannot establish it. Existing PlayMode tests in the module are not a reason on their own; logic kept behind a humble MonoBehaviour stays in EditMode.
+- **No code behaviour change** (moving, restyling or rewording existing content): no tests; `unity-verification`'s focused inspection checks it.
 
 Pass these to `unity-verification` as the assemblies or fixtures to run; the filter syntax is its concern.
 
