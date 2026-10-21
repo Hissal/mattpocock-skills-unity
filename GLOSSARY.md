@@ -46,7 +46,7 @@ The `unity` skill: the one entry point **Upstream skills** call for Unity knowle
 _Avoid_: unity setup, discovery
 
 **Verification ladder**:
-The ordered checks a **Unity repo** change can get, cheapest first: text checks, compile, targeted tests, full EditMode suite, PlayMode, player build, CI. A change is verified up to the highest rung it passed.
+The ordered checks a **Unity repo** change can get, cheapest first: text checks, compile, targeted tests, full EditMode suite, PlayMode, player build, CI. Each check is picked for the risk it establishes, not run as a gate for the ones above it; a change is verified by the rungs it passed.
 _Avoid_: check pipeline, validation steps
 
 **Unity involvement**:
